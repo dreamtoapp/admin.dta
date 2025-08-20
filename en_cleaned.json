@@ -1,0 +1,45 @@
+{
+  "app": {
+    "name": "DreamToApp",
+    "slogan": "Transform Your Ideas into Reality",
+    "localSEO": {
+      "title": "Web & Mobile App Development Company in Jeddah, Saudi Arabia",
+      "description": "Professional web and mobile app development company in Jeddah. Leading tech company in Saudi Arabia.",
+      "keywords": "web development Jeddah, mobile apps Jeddah, programming company Jeddah, website design Jeddah, app development Saudi Arabia, tech company Jeddah, web development Jeddah, mobile app Saudi Arabia"
+    }
+  },
+  "navigation": {
+    "switchLanguage": "Switch to {language}",
+    "toggleTheme": "Toggle Theme"
+  },
+  "homepage": {
+    "home": "Home",
+    "services": "Our Services",
+    "portfolio": "Our Portfolio",
+    "contact": "Contact Us",
+    "title": "DreamToApp – Shaping Your Digital Future",
+    "description": "A leading tech agency crafting web, mobile, and cloud solutions for your ambitions. Discover our services and start your journey to digital excellence.",
+    "organization": {
+      "name": "DreamToApp for Digital Solutions"
+    },
+    "breadcrumb": {
+      "home": "Home"
+    },
+    "sections": {
+      "hero": "Hero Section",
+      "cromboDetails": "Crombo Details",
+      "homepageBody": "Homepage Body"
+    },
+    "logo": {
+      "alt": "DreamToApp Logo"
+    },
+    "cta": {
+      "primary": "Start Your Dream",
+      "secondary": "Explore Our Services"
+    },
+    "slogon": "Where Dreams Begin",
+    "tagline": "DREAM. DESIGN. DELIVER.",
+    "whyChooseUs": "Why Choose Us?",
+    "joinOurTeam": "Join Our Team"
+  }
+} 
