@@ -9,7 +9,7 @@ export default async function ClientDashboardPage() {
     redirect("/auth/signin");
   }
 
-  if (session.user?.role !== "client") {
+  if (session.user?.role !== "CLIENT") {
     redirect("/dashboard");
   }
 

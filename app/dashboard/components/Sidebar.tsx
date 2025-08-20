@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -197,10 +198,7 @@ export default function Sidebar({ user }: SidebarProps) {
               variant="ghost"
               size="sm"
               className="w-full justify-start text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-              onClick={() => {
-                // TODO: Implement logout
-                console.log('Logout clicked');
-              }}
+              onClick={() => signOut({ callbackUrl: "/auth/signin" })}
             >
               <LogOut className="h-4 w-4 mr-2" />
               Sign Out
