@@ -1,331 +1,315 @@
 // Mockup data for staff profile development
-// This will be replaced with real API data later
+// This matches the actual Prisma User table schema
 
 export interface MockupProfileData {
-  personal: PersonalInfo;
-  contact: ContactInfo;
-  address: AddressInfo;
-  emergency: EmergencyContact;
-  skills: SkillsInfo;
-  languages: LanguageInfo[];
+  // Basic User Info (from User model)
+  id: string;
+  name: string | null;
+  email: string;
+  role: 'ADMIN' | 'STAFF' | 'CLIENT';
+  department: string | null;
+  isActive: boolean;
+  lastLogin: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+
+  // Personal Information (from User model)
+  fullName: string | null;
+  dateOfBirth: Date | null;
+  gender: 'MALE' | 'FEMALE' | null;
+  maritalStatus: 'SINGLE' | 'MARRIED' | 'DIVORCED' | 'WIDOWED' | null;
+  nationality: string | null;
+  profileImage: string | null;
+
+  // Contact Information (from User model)
+  mobilePrimary: string | null;
+  homePhone: string | null;
+  workExtension: string | null;
+  alternativeEmail: string | null;
+
+  // Employment Information (from User model)
+  hireDate: Date | null;
+  contractType: 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | null;
+  employmentStatus: 'ACTIVE' | 'INACTIVE' | null;
+  noticePeriod: number | null;
+  workSchedule: 'FLEXIBLE' | 'FIXED' | null;
+  workLocation: 'OFFICE' | 'REMOTE' | 'HYBRID' | null;
+  directManagerId: string | null;
+  jobTitle: string | null;
+  jobLevel: string | null;
+  basicSalary: string | null;
+  bonus: string | null;
+
+  // Official Documents (from User model)
+  documentType: 'ID_CARD' | 'PASSPORT' | null;
+  documentImage: string | null;
+
+  // Education & Skills (from User model)
+  educationLevel: string | null;
+  fieldOfStudy: string | null;
+  generalSkills: string | null;
+  generalExperience: string | null;
+
+  // Language Proficiency (simplified)
+  englishProficiency: string | null;
+
+  // Address (flattened in User model)
+  addressStreet: string | null;
+  addressCity: string | null;
+  addressCountry: string | null;
+
+  // Emergency Contact (flattened in User model)
+  emergencyContactName: string | null;
+  emergencyContactPhone: string | null;
+  emergencyContactRelationship: string | null;
+
+  // Relations (from related models)
   education: EducationInfo[];
   workExperience: WorkExperienceInfo[];
-  admin: AdminManagedInfo;
-}
 
-export interface PersonalInfo {
-  fullName: string;
-  dateOfBirth: string;
-  gender: string;
-  nationality: string;
-  profileImage: string;
-  maritalStatus: string;
-  bloodType: string;
-}
+  // Manager info
+  directManager: {
+    id: string;
+    fullName: string | null;
+    email: string;
+    jobTitle: string | null;
+  } | null;
 
-export interface ContactInfo {
-  mobilePrimary: string;
-  homePhone: string;
-  workExtension: string;
-  alternativeEmail: string;
-}
-
-export interface AddressInfo {
-  currentAddress: {
-    street: string;
-    city: string;
-    state: string;
-    country: string;
-    postalCode: string;
-  };
-  permanentAddress: {
-    street: string;
-    city: string;
-    state: string;
-    country: string;
-    postalCode: string;
-  };
-  addressType: string;
-  verificationStatus: string;
-}
-
-export interface EmergencyContact {
-  name: string;
-  phone: string;
-  relationship: string;
-  alternativePhone: string;
-}
-
-export interface SkillsInfo {
-  technicalSkills: Array<{
-    name: string;
-    level: string;
-    certification: string;
-    expiry: string;
+  // Subordinates
+  subordinates: Array<{
+    id: string;
+    fullName: string | null;
+    email: string;
+    jobTitle: string | null;
   }>;
-  softSkills: string[];
-  certifications: Array<{
-    name: string;
-    issuer: string;
-    date: string;
-    expiry: string;
-  }>;
-}
-
-export interface LanguageInfo {
-  language: string;
-  proficiency: string;
-  certified: boolean;
-  certificationDate?: string;
 }
 
 export interface EducationInfo {
+  id: string;
   degree: string;
   institution: string;
   field: string;
-  startDate: string;
-  endDate: string;
-  gpa: number;
-  country: string;
+  startDate: Date;
+  endDate: Date | null;
+  gpa: number | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface WorkExperienceInfo {
+  id: string;
   company: string;
   position: string;
-  startDate: string;
-  endDate: string;
-  description: string;
-  country: string;
+  startDate: Date;
+  endDate: Date | null;
+  description: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export interface AdminManagedInfo {
-  employeeId: string;
-  department: string;
-  jobTitle: string;
-  hireDate: string;
-  contractType: string;
-  employmentStatus: string;
-  directManager: string;
-  basicSalary: string;
-  bonus: string;
-  workSchedule: string;
-  workLocation: string;
-}
-
-// Sample mockup data
+// Sample mockup data matching Prisma schema
 export const mockupProfileData: MockupProfileData = {
-  personal: {
-    fullName: "Ahmed Hassan Al-Rashid",
-    dateOfBirth: "1990-05-15",
-    gender: "MALE",
-    nationality: "Saudi Arabian",
-    profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-    maritalStatus: "Married",
-    bloodType: "O+"
-  },
-  contact: {
-    mobilePrimary: "+966-50-123-4567",
-    homePhone: "+966-11-234-5678",
-    workExtension: "1234",
-    alternativeEmail: "ahmed.personal@email.com"
-  },
-  address: {
-    currentAddress: {
-      street: "King Fahd Road, Building 45",
-      city: "Riyadh",
-      state: "Riyadh Province",
-      country: "Saudi Arabia",
-      postalCode: "12345"
-    },
-    permanentAddress: {
-      street: "Al-Malaz District, Villa 12",
-      city: "Riyadh",
-      state: "Riyadh Province",
-      country: "Saudi Arabia",
-      postalCode: "67890"
-    },
-    addressType: "Current",
-    verificationStatus: "Verified"
-  },
-  emergency: {
-    name: "Fatima Hassan Al-Rashid",
-    phone: "+966-50-987-6543",
-    relationship: "Spouse",
-    alternativePhone: "+966-11-345-6789"
-  },
-  skills: {
-    technicalSkills: [
-      {
-        name: "React.js",
-        level: "Advanced",
-        certification: "Meta React Certification",
-        expiry: "2025-12-31"
-      },
-      {
-        name: "Node.js",
-        level: "Intermediate",
-        certification: "Node.js Developer Certificate",
-        expiry: "2024-06-30"
-      },
-      {
-        name: "MongoDB",
-        level: "Advanced",
-        certification: "MongoDB Developer",
-        expiry: "2025-03-15"
-      }
-    ],
-    softSkills: ["Leadership", "Problem Solving", "Team Collaboration", "Communication"],
-    certifications: [
-      {
-        name: "AWS Solutions Architect",
-        issuer: "Amazon Web Services",
-        date: "2023-08-15",
-        expiry: "2026-08-15"
-      },
-      {
-        name: "Project Management Professional",
-        issuer: "PMI",
-        date: "2022-11-20",
-        expiry: "2025-11-20"
-      }
-    ]
-  },
-  languages: [
-    {
-      language: "Arabic",
-      proficiency: "Native",
-      certified: true,
-      certificationDate: "2010-06-15"
-    },
-    {
-      language: "English",
-      proficiency: "Fluent",
-      certified: true,
-      certificationDate: "2015-03-20"
-    },
-    {
-      language: "French",
-      proficiency: "Intermediate",
-      certified: false
-    }
-  ],
+  // Basic User Info
+  id: "507f1f77bcf86cd799439011",
+  name: "John Doe",
+  email: "john.doe@dreamtoapp.com",
+  role: "STAFF",
+  department: "Development",
+  isActive: true,
+  lastLogin: new Date("2024-01-15T10:30:00Z"),
+  createdAt: new Date("2023-06-01T00:00:00Z"),
+  updatedAt: new Date("2024-01-15T10:30:00Z"),
+
+  // Personal Information
+  fullName: "John Michael Doe",
+  dateOfBirth: new Date("1990-05-15"),
+  gender: "MALE",
+  maritalStatus: "SINGLE",
+  nationality: "Saudi Arabian",
+  profileImage: "/api/placeholder/150/150",
+
+  // Contact Information
+  mobilePrimary: "+966-50-123-4567",
+  homePhone: "+966-11-234-5678",
+  workExtension: "1234",
+  alternativeEmail: "john.doe.personal@gmail.com",
+
+  // Employment Information
+  hireDate: new Date("2023-06-01"),
+  contractType: "FULL_TIME",
+  employmentStatus: "ACTIVE",
+  noticePeriod: 30,
+  workSchedule: "FLEXIBLE",
+  workLocation: "HYBRID",
+  directManagerId: "507f1f77bcf86cd799439012",
+  jobTitle: "Senior Full Stack Developer",
+  jobLevel: "Mid-Level",
+  basicSalary: "15,000 SAR",
+  bonus: "2,000 SAR",
+
+  // Official Documents
+  documentType: "ID_CARD",
+  documentImage: "/api/placeholder/400/250",
+
+  // Education & Skills
+  educationLevel: "Bachelor's Degree",
+  fieldOfStudy: "Computer Science",
+  generalSkills: "React, Node.js, MongoDB, Express.js, TypeScript",
+  generalExperience: "5+ years in web development, 3+ years in React ecosystem, 2+ years in Node.js backend development",
+
+  // Language Proficiency
+  englishProficiency: "85",
+
+  // Address
+  addressStreet: "King Fahd Road, Al Olaya District",
+  addressCity: "Riyadh",
+  addressCountry: "Saudi Arabia",
+
+  // Emergency Contact
+  emergencyContactName: "Sarah Doe",
+  emergencyContactPhone: "+966-50-987-6543",
+  emergencyContactRelationship: "Spouse",
+
+  // Education
   education: [
     {
-      degree: "Bachelor of Computer Science",
+      id: "507f1f77bcf86cd799439031",
+      degree: "Bachelor of Science",
       institution: "King Saud University",
       field: "Computer Science",
-      startDate: "2008-09-01",
-      endDate: "2012-06-30",
+      startDate: new Date("2008-09-01"),
+      endDate: new Date("2012-06-01"),
       gpa: 3.8,
-      country: "Saudi Arabia"
+      createdAt: new Date("2023-06-01"),
+      updatedAt: new Date("2023-06-01"),
     },
     {
-      degree: "Master of Software Engineering",
-      institution: "University of Manchester",
+      id: "507f1f77bcf86cd799439032",
+      degree: "Master of Science",
+      institution: "King Fahd University of Petroleum and Minerals",
       field: "Software Engineering",
-      startDate: "2013-09-01",
-      endDate: "2014-09-30",
+      startDate: new Date("2012-09-01"),
+      endDate: new Date("2014-06-01"),
       gpa: 3.9,
-      country: "United Kingdom"
-    }
+      createdAt: new Date("2023-06-01"),
+      updatedAt: new Date("2023-06-01"),
+    },
   ],
+
+  // Work Experience
   workExperience: [
     {
-      company: "Saudi Digital Company",
-      position: "Senior Software Developer",
-      startDate: "2015-01-15",
-      endDate: "2018-06-30",
-      description: "Led development of enterprise web applications using React and Node.js",
-      country: "Saudi Arabia"
+      id: "507f1f77bcf86cd799439041",
+      company: "Tech Solutions Ltd.",
+      position: "Junior Developer",
+      startDate: new Date("2014-07-01"),
+      endDate: new Date("2017-06-01"),
+      description: "Developed web applications using JavaScript and PHP. Worked on frontend and backend development.",
+      createdAt: new Date("2023-06-01"),
+      updatedAt: new Date("2023-06-01"),
     },
     {
-      company: "Tech Solutions Middle East",
-      position: "Lead Developer",
-      startDate: "2018-07-01",
-      endDate: "2022-12-31",
-      description: "Managed team of 8 developers, delivered 15+ projects successfully",
-      country: "Saudi Arabia"
-    }
+      id: "507f1f77bcf86cd799439042",
+      company: "Digital Innovations Co.",
+      position: "Full Stack Developer",
+      startDate: new Date("2017-07-01"),
+      endDate: new Date("2023-05-01"),
+      description: "Led development of multiple web applications using React, Node.js, and MongoDB. Mentored junior developers.",
+      createdAt: new Date("2023-06-01"),
+      updatedAt: new Date("2023-06-01"),
+    },
   ],
-  admin: {
-    employeeId: "EMP-2023-001",
-    department: "Software Development",
-    jobTitle: "Senior Software Engineer",
-    hireDate: "2023-01-15",
-    contractType: "FULL_TIME",
-    employmentStatus: "ACTIVE",
-    directManager: "Mohammed Al-Zahrani",
-    basicSalary: "25,000 SAR",
-    bonus: "5,000 SAR",
-    workSchedule: "FLEXIBLE",
-    workLocation: "HYBRID"
-  }
+
+  // Manager info
+  directManager: {
+    id: "507f1f77bcf86cd799439012",
+    fullName: "Ahmed Al-Rashid",
+    email: "ahmed.alrashid@dreamtoapp.com",
+    jobTitle: "Development Manager",
+  },
+
+  // Subordinates
+  subordinates: [
+    {
+      id: "507f1f77bcf86cd799439013",
+      fullName: "Fatima Al-Zahra",
+      email: "fatima.alzahra@dreamtoapp.com",
+      jobTitle: "Junior Developer",
+    },
+    {
+      id: "507f1f77bcf86cd799439014",
+      fullName: "Omar Al-Hassan",
+      email: "omar.alhassan@dreamtoapp.com",
+      jobTitle: "Frontend Developer",
+    },
+  ],
 };
 
-// Calculate profile completion percentage
-export function calculateProfileCompletion(data: MockupProfileData) {
-  const sections = [
-    {
-      name: "Personal Info",
-      required: true,
-      fields: Object.keys(data.personal).length,
-      completedFields: Object.values(data.personal).filter(v => v && v !== "").length
-    },
-    {
-      name: "Contact Info",
-      required: true,
-      fields: Object.keys(data.contact).length,
-      completedFields: Object.values(data.contact).filter(v => v && v !== "").length
-    },
-    {
-      name: "Address",
-      required: true,
-      fields: 2, // current + permanent address
-      completedFields: (data.address.currentAddress.street ? 1 : 0) + (data.address.permanentAddress.street ? 1 : 0)
-    },
-    {
-      name: "Emergency Contact",
-      required: true,
-      fields: 3, // name, phone, relationship
-      completedFields: [data.emergency.name, data.emergency.phone, data.emergency.relationship].filter(v => v && v !== "").length
-    },
-    {
-      name: "Skills",
-      required: false,
-      fields: 1, // at least one skill
-      completedFields: data.skills.technicalSkills.length > 0 ? 1 : 0
-    },
-    {
-      name: "Languages",
-      required: false,
-      fields: 1, // at least one language
-      completedFields: data.languages.length > 0 ? 1 : 0
-    },
-    {
-      name: "Education",
-      required: false,
-      fields: 1, // at least one education entry
-      completedFields: data.education.length > 0 ? 1 : 0
-    },
-    {
-      name: "Work Experience",
-      required: false,
-      fields: 1, // at least one work experience
-      completedFields: data.workExperience.length > 0 ? 1 : 0
-    }
+// Calculate profile completion percentage based on actual Prisma fields
+export function calculateProfileCompletion(data: MockupProfileData): number {
+  const requiredFields = [
+    'fullName',
+    'dateOfBirth',
+    'gender',
+    'nationality',
+    'mobilePrimary',
+    'hireDate',
+    'jobTitle',
+    'basicSalary',
+    'addressStreet',
+    'addressCity',
+    'addressCountry',
+    'emergencyContactName',
+    'emergencyContactPhone',
+    'emergencyContactRelationship',
   ];
 
-  const totalFields = sections.reduce((sum, section) => sum + section.fields, 0);
-  const completedFields = sections.reduce((sum, section) => sum + section.completedFields, 0);
-  const percentage = Math.round((completedFields / totalFields) * 100);
+  const optionalFields = [
+    'profileImage',
+    'homePhone',
+    'workExtension',
+    'alternativeEmail',
+    'contractType',
+    'employmentStatus',
+    'workSchedule',
+    'workLocation',
+    'jobLevel',
+    'bonus',
+    'documentType',
+    'documentImage',
+    'educationLevel',
+    'fieldOfStudy',
+    'generalSkills',
+    'generalExperience',
+  ];
 
-  return {
-    percentage,
-    sections: sections.map(section => ({
-      ...section,
-      completed: section.completedFields === section.fields
-    })),
-    totalFields,
-    completedFields
-  };
+  let completedRequired = 0;
+  let completedOptional = 0;
+
+  // Check required fields
+  requiredFields.forEach(field => {
+    const value = data[field as keyof MockupProfileData];
+    if (value !== null && value !== undefined && value !== '') {
+      completedRequired++;
+    }
+  });
+
+  // Check optional fields
+  optionalFields.forEach(field => {
+    const value = data[field as keyof MockupProfileData];
+    if (value !== null && value !== undefined && value !== '') {
+      completedOptional++;
+    }
+  });
+
+  // Check relations
+  const hasEducation = data.education.length > 0;
+  const hasWorkExperience = data.workExperience.length > 0;
+
+  const totalRequired = requiredFields.length + 2; // +2 for relations
+  const totalOptional = optionalFields.length;
+
+  const completedTotal = completedRequired + (hasEducation ? 1 : 0) + (hasWorkExperience ? 1 : 0) + completedOptional;
+
+  return Math.round((completedTotal / (totalRequired + totalOptional)) * 100);
 }

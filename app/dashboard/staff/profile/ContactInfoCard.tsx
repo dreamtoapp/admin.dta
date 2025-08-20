@@ -9,19 +9,19 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Phone, Mail, Building2, Edit2, Save, X } from "lucide-react";
-import { ContactInfo } from "./mockupData";
+import { Phone, Mail, Building2, Edit2, Save, X, User } from "lucide-react";
+import { MockupProfileData } from "./mockupData";
 
 interface ContactInfoCardProps {
-  data: ContactInfo;
-  onSave?: (data: ContactInfo) => void;
+  data: MockupProfileData;
+  onSave?: (data: Partial<MockupProfileData>) => void;
 }
 
 const contactSchema = z.object({
   mobilePrimary: z.string().min(1, "Primary mobile is required"),
-  homePhone: z.string().optional().or(z.literal("")),
-  workExtension: z.string().optional().or(z.literal("")),
-  alternativeEmail: z.string().email("Must be a valid email").optional().or(z.literal("")),
+  emergencyContactName: z.string().min(1, "Emergency contact name is required"),
+  emergencyContactPhone: z.string().min(1, "Emergency contact phone is required"),
+  emergencyContactRelationship: z.string().min(1, "Emergency contact relationship is required"),
 });
 
 type ContactFormValues = z.infer<typeof contactSchema>;
@@ -34,9 +34,9 @@ export default function ContactInfoCard({ data, onSave }: ContactInfoCardProps) 
     resolver: zodResolver(contactSchema),
     defaultValues: {
       mobilePrimary: data.mobilePrimary || "",
-      homePhone: data.homePhone || "",
-      workExtension: data.workExtension || "",
-      alternativeEmail: data.alternativeEmail || "",
+      emergencyContactName: data.emergencyContactName || "",
+      emergencyContactPhone: data.emergencyContactPhone || "",
+      emergencyContactRelationship: data.emergencyContactRelationship || "",
     },
   });
 
@@ -45,7 +45,15 @@ export default function ContactInfoCard({ data, onSave }: ContactInfoCardProps) 
 
     setSaving(true);
     try {
-      await onSave(values);
+      // Convert form values to match the data structure
+      const contactData: Partial<MockupProfileData> = {
+        mobilePrimary: values.mobilePrimary,
+        emergencyContactName: values.emergencyContactName || "",
+        emergencyContactPhone: values.emergencyContactPhone || "",
+        emergencyContactRelationship: values.emergencyContactRelationship || "",
+      };
+
+      await onSave(contactData);
       setIsEditing(false);
       form.reset(values);
     } catch (error) {
@@ -60,7 +68,7 @@ export default function ContactInfoCard({ data, onSave }: ContactInfoCardProps) 
     form.reset();
   };
 
-  const { mobilePrimary, homePhone, workExtension, alternativeEmail } = data;
+  const { mobilePrimary } = data;
 
   if (isEditing) {
     return (
@@ -88,47 +96,51 @@ export default function ContactInfoCard({ data, onSave }: ContactInfoCardProps) 
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="homePhone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Home Phone</FormLabel>
-                    <FormControl>
-                      <Input placeholder="+966-11-234-5678" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="pt-4 border-t">
+                <h4 className="text-sm font-medium mb-3">Emergency Contact</h4>
 
-              <FormField
-                control={form.control}
-                name="workExtension"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Work Extension</FormLabel>
-                    <FormControl>
-                      <Input placeholder="1234" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="emergencyContactName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Emergency Contact Name *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Sarah Doe" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="alternativeEmail"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Alternative Email</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="name@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="emergencyContactPhone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Emergency Contact Phone *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="+966-50-987-6543" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="emergencyContactRelationship"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Relationship *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Spouse, Parent, Sibling" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <div className="flex gap-2 pt-4">
                 <Button type="submit" disabled={saving} className="flex-1">
@@ -175,56 +187,62 @@ export default function ContactInfoCard({ data, onSave }: ContactInfoCardProps) 
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-secondary/10 rounded-full">
-              <Building2 className="h-4 w-4 text-secondary" />
-            </div>
-            <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground">Home Phone</label>
-              <div className="text-sm font-medium">
-                {homePhone ? (
-                  <Badge variant="secondary" className="text-xs">
-                    {homePhone}
-                  </Badge>
-                ) : (
-                  "Not provided"
-                )}
-              </div>
-            </div>
-          </div>
+          <div className="pt-4 border-t">
+            <h4 className="text-sm font-medium mb-3 text-muted-foreground">Emergency Contact</h4>
 
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-accent/10 rounded-full">
-              <Building2 className="h-4 w-4 text-accent" />
-            </div>
-            <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground">Work Extension</label>
-              <div className="text-sm font-medium">
-                {workExtension ? (
-                  <Badge variant="outline" className="text-xs">
-                    {workExtension}
-                  </Badge>
-                ) : (
-                  "Not provided"
-                )}
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-full">
+                  <User className="h-4 w-4 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <label className="text-sm font-medium text-muted-foreground">Emergency Contact Name</label>
+                  <div className="text-sm font-medium">
+                    {data.emergencyContactName ? (
+                      <Badge variant="default" className="text-xs">
+                        {data.emergencyContactName}
+                      </Badge>
+                    ) : (
+                      "Not provided"
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-destructive/10 rounded-full">
-              <Mail className="h-4 w-4 text-destructive" />
-            </div>
-            <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground">Alternative Email</label>
-              <div className="text-sm font-medium">
-                {alternativeEmail ? (
-                  <Badge variant="destructive" className="text-xs">
-                    {alternativeEmail}
-                  </Badge>
-                ) : (
-                  "Not provided"
-                )}
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-secondary/10 rounded-full">
+                  <Phone className="h-4 w-4 text-secondary" />
+                </div>
+                <div className="flex-1">
+                  <label className="text-sm font-medium text-muted-foreground">Emergency Contact Phone</label>
+                  <div className="text-sm font-medium">
+                    {data.emergencyContactPhone ? (
+                      <Badge variant="secondary" className="text-xs">
+                        {data.emergencyContactPhone}
+                      </Badge>
+                    ) : (
+                      "Not provided"
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-accent/10 rounded-full">
+                  <User className="h-4 w-4 text-accent" />
+                </div>
+                <div className="flex-1">
+                  <label className="text-sm font-medium text-muted-foreground">Relationship</label>
+                  <div className="text-sm font-medium">
+                    {data.emergencyContactRelationship ? (
+                      <Badge variant="outline" className="text-xs">
+                        {data.emergencyContactRelationship}
+                      </Badge>
+                    ) : (
+                      "Not provided"
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

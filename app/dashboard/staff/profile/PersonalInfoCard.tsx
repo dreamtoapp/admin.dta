@@ -8,26 +8,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Edit2, Save, X } from "lucide-react";
-import { PersonalInfo } from "./mockupData";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { User, Calendar, Globe, Edit2, Save, X, Camera } from "lucide-react";
+import { MockupProfileData } from "./mockupData";
 
 interface PersonalInfoCardProps {
-  data: PersonalInfo;
-  onSave?: (data: PersonalInfo) => void;
+  data: MockupProfileData;
+  onSave?: (data: Partial<MockupProfileData>) => void;
 }
 
 const personalSchema = z.object({
-  fullName: z.string().min(2, "Full name must be at least 2 characters"),
-  dateOfBirth: z.string().optional().or(z.literal("")),
-  gender: z.string().optional().or(z.literal("")),
-  nationality: z.string().min(2, "Nationality must be at least 2 characters").optional().or(z.literal("")),
-  profileImage: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  maritalStatus: z.string().optional().or(z.literal("")),
-  bloodType: z.string().optional().or(z.literal("")),
+  fullName: z.string().min(1, "Full name is required"),
+  dateOfBirth: z.string().min(1, "Date of birth is required"),
+  gender: z.enum(["MALE", "FEMALE"]).optional().or(z.literal("")),
+  maritalStatus: z.enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"]).optional().or(z.literal("")),
+  nationality: z.string().min(1, "Nationality is required"),
 });
 
 type PersonalFormValues = z.infer<typeof personalSchema>;
@@ -40,12 +36,10 @@ export default function PersonalInfoCard({ data, onSave }: PersonalInfoCardProps
     resolver: zodResolver(personalSchema),
     defaultValues: {
       fullName: data.fullName || "",
-      dateOfBirth: data.dateOfBirth || "",
+      dateOfBirth: data.dateOfBirth ? data.dateOfBirth.toISOString().split('T')[0] : "",
       gender: data.gender || "",
-      nationality: data.nationality || "",
-      profileImage: data.profileImage || "",
       maritalStatus: data.maritalStatus || "",
-      bloodType: data.bloodType || "",
+      nationality: data.nationality || "",
     },
   });
 
@@ -54,7 +48,15 @@ export default function PersonalInfoCard({ data, onSave }: PersonalInfoCardProps
 
     setSaving(true);
     try {
-      await onSave(values);
+      const personalData: Partial<MockupProfileData> = {
+        fullName: values.fullName,
+        dateOfBirth: values.dateOfBirth ? new Date(values.dateOfBirth) : null,
+        gender: values.gender as "MALE" | "FEMALE" | null || null,
+        maritalStatus: values.maritalStatus as "SINGLE" | "MARRIED" | "DIVORCED" | "WIDOWED" | null || null,
+        nationality: values.nationality,
+      };
+
+      await onSave(personalData);
       setIsEditing(false);
       form.reset(values);
     } catch (error) {
@@ -69,23 +71,15 @@ export default function PersonalInfoCard({ data, onSave }: PersonalInfoCardProps
     form.reset();
   };
 
-  const { fullName, dateOfBirth, gender, nationality, profileImage, maritalStatus, bloodType } = data;
+  const { fullName, dateOfBirth, gender, maritalStatus, nationality } = data;
 
   if (isEditing) {
     return (
       <Card className="h-full">
         <CardHeader>
-          <CardTitle className="flex items-center gap-3">
-            <Avatar className="h-12 w-12">
-              <AvatarImage src={profileImage} alt={fullName} />
-              <AvatarFallback className="bg-primary text-primary-foreground">
-                {fullName?.split(' ').map(n => n[0]).join('').toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <div className="text-lg font-semibold">Edit Personal Information</div>
-              <div className="text-sm text-muted-foreground">Update your details</div>
-            </div>
+          <CardTitle className="flex items-center gap-2">
+            <User className="h-5 w-5 text-primary" />
+            Edit Personal Information
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -98,135 +92,86 @@ export default function PersonalInfoCard({ data, onSave }: PersonalInfoCardProps
                   <FormItem>
                     <FormLabel>Full Name *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your full name" {...field} />
+                      <Input placeholder="John Michael Doe" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="dateOfBirth"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Date of Birth</FormLabel>
+              <FormField
+                control={form.control}
+                name="dateOfBirth"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Date of Birth *</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="gender"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Gender</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <Input type="date" {...field} />
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select gender" />
+                        </SelectTrigger>
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                      <SelectContent>
+                        <SelectItem value="MALE">Male</SelectItem>
+                        <SelectItem value="FEMALE">Female</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="gender"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Gender</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select gender" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="MALE">Male</SelectItem>
-                          <SelectItem value="FEMALE">Female</SelectItem>
-                          <SelectItem value="OTHER">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="nationality"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nationality</FormLabel>
+              <FormField
+                control={form.control}
+                name="maritalStatus"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Marital Status</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <Input placeholder="e.g., Saudi Arabian" {...field} />
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select marital status" />
+                        </SelectTrigger>
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                      <SelectContent>
+                        <SelectItem value="SINGLE">Single</SelectItem>
+                        <SelectItem value="MARRIED">Married</SelectItem>
+                        <SelectItem value="DIVORCED">Divorced</SelectItem>
+                        <SelectItem value="WIDOWED">Widowed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="maritalStatus"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Marital Status</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="SINGLE">Single</SelectItem>
-                          <SelectItem value="MARRIED">Married</SelectItem>
-                          <SelectItem value="DIVORCED">Divorced</SelectItem>
-                          <SelectItem value="WIDOWED">Widowed</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="bloodType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Blood Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select blood type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="A+">A+</SelectItem>
-                          <SelectItem value="A-">A-</SelectItem>
-                          <SelectItem value="B+">B+</SelectItem>
-                          <SelectItem value="B-">B-</SelectItem>
-                          <SelectItem value="AB+">AB+</SelectItem>
-                          <SelectItem value="AB-">AB-</SelectItem>
-                          <SelectItem value="O+">O+</SelectItem>
-                          <SelectItem value="O-">O-</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="profileImage"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Profile Image URL</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://..." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="nationality"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nationality *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Saudi Arabian" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <div className="flex gap-2 pt-4">
                 <Button type="submit" disabled={saving} className="flex-1">
@@ -248,61 +193,100 @@ export default function PersonalInfoCard({ data, onSave }: PersonalInfoCardProps
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle className="flex items-center gap-3">
-          <Avatar className="h-12 w-12">
-            <AvatarImage src={profileImage} alt={fullName} />
-            <AvatarFallback className="bg-primary text-primary-foreground">
-              {fullName?.split(' ').map(n => n[0]).join('').toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <div className="text-lg font-semibold">{fullName || "Not provided"}</div>
-            <div className="text-sm text-muted-foreground">Personal Information</div>
-          </div>
+        <CardTitle className="flex items-center gap-2">
+          <User className="h-5 w-5 text-primary" />
+          Personal Information
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">Date of Birth</label>
-            <div className="text-sm">{dateOfBirth ? new Date(dateOfBirth).toLocaleDateString() : "Not provided"}</div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">Gender</label>
-            <div className="text-sm">
-              {gender ? (
-                <Badge variant="outline">{gender}</Badge>
-              ) : (
-                "Not provided"
-              )}
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-full">
+              <User className="h-4 w-4 text-primary" />
+            </div>
+            <div className="flex-1">
+              <label className="text-sm font-medium text-muted-foreground">Full Name</label>
+              <div className="text-sm font-medium">
+                {fullName ? (
+                  <Badge variant="default" className="text-xs">
+                    {fullName}
+                  </Badge>
+                ) : (
+                  "Not provided"
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">Nationality</label>
-            <div className="text-sm">{nationality || "Not provided"}</div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">Marital Status</label>
-            <div className="text-sm">
-              {maritalStatus ? (
-                <Badge variant="secondary">{maritalStatus}</Badge>
-              ) : (
-                "Not provided"
-              )}
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-secondary/10 rounded-full">
+              <Calendar className="h-4 w-4 text-secondary" />
+            </div>
+            <div className="flex-1">
+              <label className="text-sm font-medium text-muted-foreground">Date of Birth</label>
+              <div className="text-sm font-medium">
+                {dateOfBirth ? (
+                  <Badge variant="secondary" className="text-xs">
+                    {dateOfBirth.toLocaleDateString()}
+                  </Badge>
+                ) : (
+                  "Not provided"
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">Blood Type</label>
-            <div className="text-sm">
-              {bloodType ? (
-                <Badge variant="destructive">{bloodType}</Badge>
-              ) : (
-                "Not provided"
-              )}
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-accent/10 rounded-full">
+              <User className="h-4 w-4 text-accent" />
+            </div>
+            <div className="flex-1">
+              <label className="text-sm font-medium text-muted-foreground">Gender</label>
+              <div className="text-sm font-medium">
+                {gender ? (
+                  <Badge variant="outline" className="text-xs">
+                    {gender}
+                  </Badge>
+                ) : (
+                  "Not provided"
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-full">
+              <User className="h-4 w-4 text-primary" />
+            </div>
+            <div className="flex-1">
+              <label className="text-sm font-medium text-muted-foreground">Marital Status</label>
+              <div className="text-sm font-medium">
+                {maritalStatus ? (
+                  <Badge variant="default" className="text-xs">
+                    {maritalStatus}
+                  </Badge>
+                ) : (
+                  "Not provided"
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-destructive/10 rounded-full">
+              <Globe className="h-4 w-4 text-destructive" />
+            </div>
+            <div className="flex-1">
+              <label className="text-sm font-medium text-muted-foreground">Nationality</label>
+              <div className="text-sm font-medium">
+                {nationality ? (
+                  <Badge variant="destructive" className="text-xs">
+                    {nationality}
+                  </Badge>
+                ) : (
+                  "Not provided"
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -315,7 +299,7 @@ export default function PersonalInfoCard({ data, onSave }: PersonalInfoCardProps
               variant="outline"
             >
               <Edit2 className="h-4 w-4 mr-2" />
-              Edit Information
+              Edit Personal Info
             </Button>
           </div>
         )}

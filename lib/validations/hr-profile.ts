@@ -7,6 +7,7 @@ export const personalInfoSchema = z.object({
     .max(100, "Full name must be less than 100 characters"),
   dateOfBirth: z.string().optional().or(z.literal("")),
   gender: z.enum(["MALE", "FEMALE"]).optional(),
+  maritalStatus: z.enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"]).optional().or(z.literal("")),
   nationality: z.string()
     .min(2, "Nationality must be at least 2 characters")
     .max(50, "Nationality must be less than 50 characters")

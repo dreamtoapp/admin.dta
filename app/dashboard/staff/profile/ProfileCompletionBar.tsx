@@ -1,70 +1,62 @@
 "use client";
 
 import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-interface ProfileSection {
-  name: string;
-  completed: boolean;
-  required: boolean;
-  fields: number;
-  completedFields: number;
-}
+import { Target } from "lucide-react";
+import { MockupProfileData } from "./mockupData";
 
 interface ProfileCompletionBarProps {
-  completion: {
-    percentage: number;
-    sections: ProfileSection[];
-    totalFields: number;
-    completedFields: number;
-  };
+  data: MockupProfileData;
 }
 
-export default function ProfileCompletionBar({ completion }: ProfileCompletionBarProps) {
-  const { percentage, sections, totalFields, completedFields } = completion;
+export default function ProfileCompletionBar({ data }: ProfileCompletionBarProps) {
+  // Calculate completion based on required fields
+  const requiredFields = [
+    'fullName', 'dateOfBirth', 'nationality', 'mobilePrimary', 'email',
+    'addressStreet', 'addressCity', 'addressCountry',
+    'emergencyContactName', 'emergencyContactPhone', 'emergencyContactRelationship'
+  ];
+
+  const optionalFields = [
+    'gender', 'profileImage', 'homePhone', 'workExtension', 'alternativeEmail',
+    'generalSkills', 'generalExperience'
+  ];
+
+  const completedRequired = requiredFields.filter(field => {
+    const value = data[field as keyof MockupProfileData];
+    return value && value !== "" && value !== null;
+  }).length;
+
+  const completedOptional = optionalFields.filter(field => {
+    const value = data[field as keyof MockupProfileData];
+    return value && value !== "" && value !== null;
+  }).length;
+
+  // Check if relations have at least one entry
+  const hasLanguages = data.languages && data.languages.length > 0;
+  const hasEducation = data.education && data.education.length > 0;
+  const hasWorkExperience = data.workExperience && data.workExperience.length > 0;
+
+  const totalRequired = requiredFields.length + 3; // +3 for relations
+  const totalOptional = optionalFields.length;
+
+  const completedTotal = completedRequired + (hasLanguages ? 1 : 0) + (hasEducation ? 1 : 0) + (hasWorkExperience ? 1 : 0) + completedOptional;
+
+  const completionPercentage = Math.round((completedTotal / (totalRequired + totalOptional)) * 100);
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>Profile Completion</span>
-          <Badge variant={percentage === 100 ? "default" : "secondary"}>
-            {percentage}% Complete
-          </Badge>
+    <Card className="border-0 shadow-sm">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Progress Bar */}
+      <CardContent className="pt-0">
         <div className="space-y-2">
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>{completedFields} of {totalFields} fields completed</span>
-            <span>{percentage}%</span>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted-foreground">Completion</span>
+            <span className="text-sm font-medium">{completionPercentage}%</span>
           </div>
-          <Progress value={percentage} className="h-3" />
-        </div>
-
-        {/* Section Status */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {sections.map((section) => (
-            <div
-              key={section.name}
-              className={`p-3 rounded-lg border text-center ${section.completed
-                  ? "bg-green-50 border-green-200 text-green-800"
-                  : "bg-gray-50 border-gray-200 text-gray-600"
-                }`}
-            >
-              <div className="text-sm font-medium">{section.name}</div>
-              <div className="text-xs text-muted-foreground">
-                {section.completedFields}/{section.fields} fields
-              </div>
-              {section.required && !section.completed && (
-                <Badge variant="destructive" className="mt-1 text-xs">
-                  Required
-                </Badge>
-              )}
-            </div>
-          ))}
+          <Progress value={completionPercentage} className="h-2" />
         </div>
       </CardContent>
     </Card>

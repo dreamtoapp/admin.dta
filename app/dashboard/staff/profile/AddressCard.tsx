@@ -8,60 +8,33 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { MapPin, Home, Building, Edit2, Save, X } from "lucide-react";
-import { AddressInfo } from "./mockupData";
+import { MapPin, Edit2, Save, X } from "lucide-react";
+import { MockupProfileData } from "./mockupData";
 
-interface AddressInfoCardProps {
-  data: AddressInfo;
-  onSave?: (data: AddressInfo) => void;
+interface AddressCardProps {
+  data: MockupProfileData;
+  onSave?: (data: Partial<MockupProfileData>) => void;
 }
 
 const addressSchema = z.object({
-  currentAddress: z.object({
-    street: z.string().min(1, "Street is required"),
-    city: z.string().min(1, "City is required"),
-    state: z.string().min(1, "State is required"),
-    country: z.string().min(1, "Country is required"),
-    postalCode: z.string().min(1, "Postal code is required"),
-  }),
-  permanentAddress: z.object({
-    street: z.string().min(1, "Street is required"),
-    city: z.string().min(1, "City is required"),
-    state: z.string().min(1, "State is required"),
-    country: z.string().min(1, "Country is required"),
-    postalCode: z.string().min(1, "Postal code is required"),
-  }),
-  addressType: z.string().optional().or(z.literal("")),
-  verificationStatus: z.string().optional().or(z.literal("")),
+  addressStreet: z.string().min(1, "Street address is required"),
+  addressCity: z.string().min(1, "City is required"),
+  addressCountry: z.string().min(1, "Country is required"),
 });
 
 type AddressFormValues = z.infer<typeof addressSchema>;
 
-export default function AddressCard({ data, onSave }: AddressInfoCardProps) {
+export default function AddressCard({ data, onSave }: AddressCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const form = useForm<AddressFormValues>({
     resolver: zodResolver(addressSchema),
     defaultValues: {
-      currentAddress: {
-        street: data.currentAddress.street || "",
-        city: data.currentAddress.city || "",
-        state: data.currentAddress.state || "",
-        country: data.currentAddress.country || "",
-        postalCode: data.currentAddress.postalCode || "",
-      },
-      permanentAddress: {
-        street: data.permanentAddress.street || "",
-        city: data.permanentAddress.city || "",
-        state: data.permanentAddress.state || "",
-        country: data.permanentAddress.country || "",
-        postalCode: data.permanentAddress.postalCode || "",
-      },
-      addressType: data.addressType || "",
-      verificationStatus: data.verificationStatus || "",
+      addressStreet: data.addressStreet || "",
+      addressCity: data.addressCity || "",
+      addressCountry: data.addressCountry || "",
     },
   });
 
@@ -70,7 +43,13 @@ export default function AddressCard({ data, onSave }: AddressInfoCardProps) {
 
     setSaving(true);
     try {
-      await onSave(values);
+      const addressData: Partial<MockupProfileData> = {
+        addressStreet: values.addressStreet,
+        addressCity: values.addressCity,
+        addressCountry: values.addressCountry,
+      };
+
+      await onSave(addressData);
       setIsEditing(false);
       form.reset(values);
     } catch (error) {
@@ -85,7 +64,7 @@ export default function AddressCard({ data, onSave }: AddressInfoCardProps) {
     form.reset();
   };
 
-  const { currentAddress, permanentAddress, addressType, verificationStatus } = data;
+  const { addressStreet, addressCity, addressCountry } = data;
 
   if (isEditing) {
     return (
@@ -98,215 +77,48 @@ export default function AddressCard({ data, onSave }: AddressInfoCardProps) {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {/* Current Address */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Home className="h-4 w-4 text-green-600" />
-                  <span className="text-sm font-medium text-green-700">Current Address</span>
-                </div>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="addressStreet"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Street Address *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="King Fahd Road, Al Olaya District" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="currentAddress.street"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Street *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter street address" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              <FormField
+                control={form.control}
+                name="addressCity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>City *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Riyadh" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                  <FormField
-                    control={form.control}
-                    name="currentAddress.city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>City *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter city" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="currentAddress.state"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>State/Province *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter state" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="currentAddress.country"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Country *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter country" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="currentAddress.postalCode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Postal Code *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter postal code" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-              {/* Permanent Address */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Building className="h-4 w-4 text-blue-600" />
-                  <span className="text-sm font-medium text-blue-700">Permanent Address</span>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="permanentAddress.street"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Street *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter street address" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="permanentAddress.city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>City *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter city" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="permanentAddress.state"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>State/Province *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter state" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="permanentAddress.country"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Country *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter country" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="permanentAddress.postalCode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Postal Code *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter postal code" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-              {/* Address Details */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
-                <FormField
-                  control={form.control}
-                  name="addressType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Address Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select address type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="CURRENT">Current</SelectItem>
-                          <SelectItem value="PERMANENT">Permanent</SelectItem>
-                          <SelectItem value="BOTH">Both</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="verificationStatus"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Verification Status</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="VERIFIED">Verified</SelectItem>
-                          <SelectItem value="PENDING">Pending</SelectItem>
-                          <SelectItem value="UNVERIFIED">Unverified</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="addressCountry"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Country *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Saudi Arabia" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <div className="flex gap-2 pt-4">
                 <Button type="submit" disabled={saving} className="flex-1">
@@ -335,91 +147,55 @@ export default function AddressCard({ data, onSave }: AddressInfoCardProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-4">
-          {/* Current Address */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Home className="h-4 w-4 text-green-600" />
-              <span className="text-sm font-medium text-green-700">Current Address</span>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-full">
+              <MapPin className="h-4 w-4 text-primary" />
             </div>
-            <div className="pl-6 space-y-2">
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Street:</span>
-                  <div className="font-medium">{currentAddress.street || "Not provided"}</div>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">City:</span>
-                  <div className="font-medium">{currentAddress.city || "Not provided"}</div>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">State:</span>
-                  <div className="font-medium">{currentAddress.state || "Not provided"}</div>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Country:</span>
-                  <div className="font-medium">{currentAddress.country || "Not provided"}</div>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Postal Code:</span>
-                  <div className="font-medium">{currentAddress.postalCode || "Not provided"}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Permanent Address */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Building className="h-4 w-4 text-blue-600" />
-              <span className="text-sm font-medium text-blue-700">Permanent Address</span>
-            </div>
-            <div className="pl-6 space-y-2">
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Street:</span>
-                  <div className="font-medium">{permanentAddress.street || "Not provided"}</div>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">City:</span>
-                  <div className="font-medium">{permanentAddress.city || "Not provided"}</div>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">State:</span>
-                  <div className="font-medium">{permanentAddress.state || "Not provided"}</div>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Country:</span>
-                  <div className="font-medium">{permanentAddress.country || "Not provided"}</div>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Postal Code:</span>
-                  <div className="font-medium">{permanentAddress.postalCode || "Not provided"}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Address Details */}
-          <div className="grid grid-cols-2 gap-4 pt-2 border-t">
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Address Type</label>
-              <div className="text-sm">
-                {addressType ? (
-                  <Badge variant="outline">{addressType}</Badge>
+            <div className="flex-1">
+              <label className="text-sm font-medium text-muted-foreground">Street Address</label>
+              <div className="text-sm font-medium">
+                {addressStreet ? (
+                  <Badge variant="default" className="text-xs">
+                    {addressStreet}
+                  </Badge>
                 ) : (
-                  "Not specified"
+                  "Not provided"
                 )}
               </div>
             </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Verification Status</label>
-              <div className="text-sm">
-                {verificationStatus ? (
-                  <Badge variant={verificationStatus === "Verified" ? "default" : "secondary"}>
-                    {verificationStatus}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-secondary/10 rounded-full">
+              <MapPin className="h-4 w-4 text-secondary" />
+            </div>
+            <div className="flex-1">
+              <label className="text-sm font-medium text-muted-foreground">City</label>
+              <div className="text-sm font-medium">
+                {addressCity ? (
+                  <Badge variant="secondary" className="text-xs">
+                    {addressCity}
                   </Badge>
                 ) : (
-                  "Not verified"
+                  "Not provided"
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-accent/10 rounded-full">
+              <MapPin className="h-4 w-4 text-accent" />
+            </div>
+            <div className="flex-1">
+              <label className="text-sm font-medium text-muted-foreground">Country</label>
+              <div className="text-sm font-medium">
+                {addressCountry ? (
+                  <Badge variant="outline" className="text-xs">
+                    {addressCountry}
+                  </Badge>
+                ) : (
+                  "Not provided"
                 )}
               </div>
             </div>
