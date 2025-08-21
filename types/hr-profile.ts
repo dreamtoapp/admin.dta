@@ -180,21 +180,32 @@ export interface UpdateUserProfileRequest {
   fullName?: string;
   dateOfBirth?: string; // ISO date string
   gender?: Gender;
+  maritalStatus?: string;
   nationality?: string;
   profileImage?: string;
 
   // Contact Information
-  mobilePrimary?: string;
-  homePhone?: string;
-  workExtension?: string;
-  alternativeEmail?: string;
+  mobile?: string;
+  contactEmail?: string;
 
-  // Education & Skills
-  educationLevel?: string;
-  fieldOfStudy?: string;
-  generalSkills?: string;
-  generalExperience?: string;
+  // Address Information (flattened)
+  addressStreet?: string;
+  addressCity?: string;
+  addressCountry?: string;
+  latitude?: number;
+  longitude?: number;
+
+  // Emergency Contact Information (flattened)
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  emergencyContactRelationship?: string;
+
+  // Education & Skills (SIMPLIFIED)
+  educationSummary?: string;
+  workExperienceSummary?: string;
   englishProficiency?: string;
+  certifications?: string;
+  professionalDevelopment?: string;
 
   // Official Documents
   documentType?: string;

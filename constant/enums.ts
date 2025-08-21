@@ -103,8 +103,9 @@ export enum Environments {
   DEV = "development",
 }
 export enum UserRole {
-  USER = "USER",
   ADMIN = "ADMIN",
+  STAFF = "STAFF",
+  CLIENT = "CLIENT",
 }
 
 export enum questionQueryMode {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { UpdateUserProfileRequest } from '@/types';
+import { UserRole } from '@/constant/enums';
 
 // GET user by ID with full HR profile data
 export async function GET(
@@ -30,9 +31,6 @@ export async function GET(
     const user = await prisma.user.findUnique({
       where: { id },
       include: {
-        languages: true,
-        education: true,
-        workExperience: true,
         directManager: {
           select: {
             id: true,
@@ -81,26 +79,68 @@ export async function PUT(
     const { id } = await params;
     const session = await auth();
 
+    console.log("PUT request received for user ID:", id);
+    console.log("Session user ID:", session?.user?.id);
+    console.log("Session user role:", session?.user?.role);
+
     if (!session?.user?.id) {
+      console.log("No session found");
       return NextResponse.json(
         { message: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    // Users can only update their own profile
-    if (session.user.id !== id) {
+    // Users can only update their own profile, or admins can update any profile
+    if (session.user.role !== UserRole.ADMIN && session.user.id !== id) {
+      console.log("User ID mismatch:", session.user.id, "!=", id);
       return NextResponse.json(
         { message: 'You can only update your own profile' },
         { status: 403 }
       );
     }
 
-    const updateData: UpdateUserProfileRequest = await request.json();
+    // Check if request has a body
+    const contentType = request.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.log("Invalid content type:", contentType);
+      return NextResponse.json(
+        { message: 'Content-Type must be application/json' },
+        { status: 400 }
+      );
+    }
+
+    // Safely parse JSON with error handling
+    let updateData: UpdateUserProfileRequest;
+    try {
+      const bodyText = await request.text();
+      console.log("Raw request body:", bodyText);
+
+      if (!bodyText || bodyText.trim() === '') {
+        console.log("Empty request body");
+        return NextResponse.json(
+          { message: 'Request body cannot be empty' },
+          { status: 400 }
+        );
+      }
+
+      updateData = JSON.parse(bodyText);
+    } catch (parseError) {
+      console.log("JSON parse error:", parseError);
+      return NextResponse.json(
+        { message: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
+
+    console.log("Received update data:", updateData);
 
     // Validate that at least one field is provided for update
     const hasUpdates = Object.keys(updateData).some(key => updateData[key as keyof UpdateUserProfileRequest] !== undefined);
+    console.log("Has updates:", hasUpdates);
+
     if (!hasUpdates) {
+      console.log("No updates provided");
       return NextResponse.json(
         { message: 'At least one field must be provided for update' },
         { status: 400 }
@@ -116,50 +156,39 @@ export async function PUT(
     if (updateData.fullName !== undefined) updateFields.fullName = updateData.fullName;
     if (updateData.dateOfBirth !== undefined) updateFields.dateOfBirth = updateData.dateOfBirth ? new Date(updateData.dateOfBirth) : null;
     if (updateData.gender !== undefined) updateFields.gender = updateData.gender;
-    if ((updateData as any).maritalStatus !== undefined) updateFields.maritalStatus = (updateData as any).maritalStatus;
+    if (updateData.maritalStatus !== undefined) updateFields.maritalStatus = updateData.maritalStatus;
     if (updateData.nationality !== undefined) updateFields.nationality = updateData.nationality;
     if (updateData.profileImage !== undefined) updateFields.profileImage = updateData.profileImage;
 
     // Contact Information (Staff editable)
-    if (updateData.mobilePrimary !== undefined) updateFields.mobilePrimary = updateData.mobilePrimary;
-    if (updateData.homePhone !== undefined) updateFields.homePhone = updateData.homePhone;
-    if (updateData.workExtension !== undefined) updateFields.workExtension = updateData.workExtension;
-    if (updateData.alternativeEmail !== undefined) updateFields.alternativeEmail = updateData.alternativeEmail;
+    if (updateData.mobile !== undefined) updateFields.mobile = updateData.mobile;
+    if (updateData.contactEmail !== undefined) updateFields.contactEmail = updateData.contactEmail;
 
     // Flattened Address (Staff editable)
-    if ((updateData as any).addressStreet !== undefined) updateFields.addressStreet = (updateData as any).addressStreet;
-    if ((updateData as any).addressCity !== undefined) updateFields.addressCity = (updateData as any).addressCity;
-    if ((updateData as any).addressCountry !== undefined) updateFields.addressCountry = (updateData as any).addressCountry;
+    if (updateData.addressStreet !== undefined) updateFields.addressStreet = updateData.addressStreet;
+    if (updateData.addressCity !== undefined) updateFields.addressCity = updateData.addressCity;
+    if (updateData.addressCountry !== undefined) updateFields.addressCountry = updateData.addressCountry;
+    if (updateData.latitude !== undefined) updateFields.latitude = updateData.latitude;
+    if (updateData.longitude !== undefined) updateFields.longitude = updateData.longitude;
 
     // Flattened Emergency Contact (Staff editable)
-    if ((updateData as any).emergencyContactName !== undefined) updateFields.emergencyContactName = (updateData as any).emergencyContactName;
-    if ((updateData as any).emergencyContactPhone !== undefined) updateFields.emergencyContactPhone = (updateData as any).emergencyContactPhone;
-    if ((updateData as any).emergencyContactRelationship !== undefined) updateFields.emergencyContactRelationship = (updateData as any).emergencyContactRelationship;
+    if (updateData.emergencyContactName !== undefined) updateFields.emergencyContactName = updateData.emergencyContactName;
+    if (updateData.emergencyContactPhone !== undefined) updateFields.emergencyContactPhone = updateData.emergencyContactPhone;
+    if (updateData.emergencyContactRelationship !== undefined) updateFields.emergencyContactRelationship = updateData.emergencyContactRelationship;
 
-    // Education & Skills (Staff editable)
-    if (updateData.educationLevel !== undefined) updateFields.educationLevel = updateData.educationLevel;
-    if (updateData.fieldOfStudy !== undefined) updateFields.fieldOfStudy = updateData.fieldOfStudy;
-    if ((updateData as any).institution !== undefined) updateFields.institution = (updateData as any).institution;
-    if ((updateData as any).graduationYear !== undefined) updateFields.graduationYear = (updateData as any).graduationYear;
-    if ((updateData as any).gpa !== undefined) updateFields.gpa = (updateData as any).gpa ? parseFloat((updateData as any).gpa) : null;
-    if (updateData.generalSkills !== undefined) updateFields.generalSkills = updateData.generalSkills;
-    if ((updateData as any).technicalSkills !== undefined) updateFields.technicalSkills = (updateData as any).technicalSkills;
-    if ((updateData as any).softSkills !== undefined) updateFields.softSkills = (updateData as any).softSkills;
-    if (updateData.generalExperience !== undefined) updateFields.generalExperience = updateData.generalExperience;
-    if ((updateData as any).yearsOfExperience !== undefined) updateFields.yearsOfExperience = (updateData as any).yearsOfExperience;
-    if ((updateData as any).specializations !== undefined) updateFields.specializations = (updateData as any).specializations;
-    if ((updateData as any).englishProficiency !== undefined) updateFields.englishProficiency = (updateData as any).englishProficiency;
-    if ((updateData as any).arabicProficiency !== undefined) updateFields.arabicProficiency = (updateData as any).arabicProficiency;
-    if ((updateData as any).otherLanguages !== undefined) updateFields.otherLanguages = (updateData as any).otherLanguages;
-    if ((updateData as any).certifications !== undefined) updateFields.certifications = (updateData as any).certifications;
-    if ((updateData as any).professionalDevelopment !== undefined) updateFields.professionalDevelopment = (updateData as any).professionalDevelopment;
+    // Education & Skills (Staff editable) - SIMPLIFIED
+    if (updateData.educationSummary !== undefined) updateFields.educationSummary = updateData.educationSummary;
+    if (updateData.workExperienceSummary !== undefined) updateFields.workExperienceSummary = updateData.workExperienceSummary;
+    if (updateData.englishProficiency !== undefined) updateFields.englishProficiency = updateData.englishProficiency;
+    if (updateData.certifications !== undefined) updateFields.certifications = updateData.certifications;
+    if (updateData.professionalDevelopment !== undefined) updateFields.professionalDevelopment = updateData.professionalDevelopment;
 
     // Official Documents (Staff editable)
     if (updateData.documentType !== undefined) updateFields.documentType = updateData.documentType;
     if (updateData.documentImage !== undefined) updateFields.documentImage = updateData.documentImage;
 
     // Employment Information (Admin only - check permissions)
-    if (session.user.role === 'ADMIN') {
+    if (session.user.role === UserRole.ADMIN) {
       if (updateData.hireDate !== undefined) updateFields.hireDate = updateData.hireDate ? new Date(updateData.hireDate) : null;
       if (updateData.contractType !== undefined) updateFields.contractType = updateData.contractType;
       if (updateData.employmentStatus !== undefined) updateFields.employmentStatus = updateData.employmentStatus;
@@ -178,13 +207,12 @@ export async function PUT(
     if (updateData.email !== undefined) updateFields.email = updateData.email;
 
     // Update user
+    console.log("Final update fields being sent to database:", updateFields);
+
     const updatedUser = await prisma.user.update({
       where: { id },
       data: updateFields,
       include: {
-        languages: true,
-        education: true,
-        workExperience: true,
         directManager: {
           select: {
             id: true,
@@ -205,6 +233,8 @@ export async function PUT(
         }
       }
     });
+
+    console.log("Database update successful, updated user:", updatedUser);
 
     const { password: _omit, ...safeUser } = updatedUser as any;
 

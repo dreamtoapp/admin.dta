@@ -69,10 +69,8 @@ model User {
   profileImage      String?
 
   // Contact Information
-  mobilePrimary    String?
-  homePhone        String?
-  workExtension    String?
-  alternativeEmail String?
+  mobile        String?
+  contactEmail  String?
 
   // Employment Information
   hireDate         DateTime?
@@ -91,21 +89,12 @@ model User {
   documentType     DocumentType? // ID_CARD, PASSPORT
   documentImage    String? // URL to document image
 
-  // Education & Skills (Enhanced fields)
-  educationLevel   String?
-  fieldOfStudy     String?
-  institution      String?
-  graduationYear   String?
-  gpa              Float?
-  generalSkills    String? // Core skills as text
-  technicalSkills  String? // Technical specializations
-  softSkills       String? // Soft skills and leadership
-  generalExperience String? // Experience summary as text
-  yearsOfExperience String? // Years of experience
-  specializations  String? // Industry focus areas
+  // Education & Skills (SIMPLIFIED - Single text fields)
+  educationSummary String? // Simple text for education summary
+  workExperienceSummary String? // Simple text for work experience summary
+  
+  // Language Skills (kept for now)
   englishProficiency String?
-  arabicProficiency String?
-  otherLanguages   String?
   certifications   String? // Professional certifications
   professionalDevelopment String? // Continuous learning
 
@@ -133,9 +122,8 @@ model User {
   notificationsSent     TaskNotification[] @relation("NotificationSender")
   
   // HR Profile Relations
-  languages        Language[]
-  education        Education[]
-  workExperience   WorkExperience[]
+  // Removed: education Education[] - replaced with educationSummary text field
+  // Removed: workExperience WorkExperience[] - replaced with workExperienceSummary text field
   
   // WorkLog Relations
   workLogs         WorkLog[]
@@ -415,49 +403,9 @@ model ApplicationStatusHistory {
 
 // Removed Skill model – using User.generalSkills instead
 
-model Language {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @db.ObjectId
-  language    String
-  proficiency LanguageProficiency
-  certified   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // Relations
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
+// Removed Language model – no longer needed
 
-model Education {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @db.ObjectId
-  degree      String
-  institution String
-  field       String
-  startDate   DateTime
-  endDate     DateTime?
-  gpa         Float?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // Relations
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model WorkExperience {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @db.ObjectId
-  company     String
-  position    String
-  startDate   DateTime
-  endDate     DateTime?
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // Relations
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
+// Removed Education and WorkExperience models - replaced with simple text fields in User model
 
 // Staff Productivity Tracking
 model WorkLog {
@@ -559,11 +507,4 @@ enum SkillLevel {
   BEGINNER
   INTERMEDIATE
   ADVANCED
-}
-
-enum LanguageProficiency {
-  BASIC
-  INTERMEDIATE
-  ADVANCED
-  FLUENT
 }

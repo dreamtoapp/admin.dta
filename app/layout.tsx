@@ -92,6 +92,8 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://www.google-analytics.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+        {/* SweetAlert2 CSS */}
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
       </head>
       <body className={`${systemFonts.className} min-h-screen bg-background antialiased`}>
         {/* GTM Script - Next.js Official Method */}

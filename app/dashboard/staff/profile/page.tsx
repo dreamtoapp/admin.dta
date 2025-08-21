@@ -1,11 +1,12 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import StaffProfileClient from "./StaffProfileClient";
+import { UserRole } from "@/constant/enums";
 
 export default async function StaffProfilePage() {
   const session = await auth();
   if (!session) redirect("/auth/signin");
-  if (session.user?.role !== "STAFF") redirect("/dashboard");
+  if (session.user?.role !== UserRole.STAFF && session.user?.role !== UserRole.CLIENT) redirect("/dashboard");
 
   return (
     <div className="p-6 space-y-6">

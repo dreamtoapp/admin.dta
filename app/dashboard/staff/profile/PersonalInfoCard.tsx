@@ -1,99 +1,118 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Calendar, Globe, Edit2, Save, X, Camera } from "lucide-react";
-import { MockupProfileData } from "./mockupData";
-
-interface PersonalInfoCardProps {
-  data: MockupProfileData;
-  onSave?: (data: Partial<MockupProfileData>) => void;
-  isEditing: boolean;
-}
+import { ProfileData, ProfileDataUpdate } from "./types";
 
 const personalSchema = z.object({
   fullName: z.string().min(1, "Full name is required"),
-  dateOfBirth: z.string().min(1, "Date of birth is required"),
-  gender: z.string().optional().or(z.literal("")),
-  maritalStatus: z.string().optional().or(z.literal("")),
-  mobilePrimary: z.string().min(1, "Primary mobile is required"),
-  email: z.string().min(1, "Primary email is required").email("Invalid email format"),
-  englishProficiency: z.string().min(1, "English proficiency is required"),
+  mobile: z.string().optional(),
+  contactEmail: z.string().email("Invalid email address").optional(),
+  dateOfBirth: z.string().optional(),
+  gender: z.enum(["MALE", "FEMALE"]).nullable().optional(),
+  maritalStatus: z.enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"]).nullable().optional(),
+  nationality: z.string().optional(),
 });
 
 type PersonalFormValues = z.infer<typeof personalSchema>;
 
-export default function PersonalInfoCard({ data, onSave, isEditing }: PersonalInfoCardProps) {
-  const [saving, setSaving] = useState(false);
+interface PersonalInfoCardProps {
+  data: ProfileData;
+  onChange: (data: ProfileDataUpdate) => void;
+}
+
+export default function PersonalInfoCard({ data, onChange }: PersonalInfoCardProps) {
+  // Helper function to safely convert date to string
+  const formatDateForInput = (date: Date | string | null | undefined): string => {
+    if (!date) return "";
+    try {
+      const dateObj = typeof date === 'string' ? new Date(date) : date;
+      if (isNaN(dateObj.getTime())) return "";
+      return dateObj.toISOString().split('T')[0];
+    } catch {
+      return "";
+    }
+  };
 
   const form = useForm<PersonalFormValues>({
     resolver: zodResolver(personalSchema),
     defaultValues: {
       fullName: data.fullName || "",
-      dateOfBirth: data.dateOfBirth ? data.dateOfBirth.toISOString().split('T')[0] : "",
-      gender: data.gender || "",
-      maritalStatus: data.maritalStatus || "",
-      mobilePrimary: data.mobilePrimary || "",
-      email: data.email || "",
-      englishProficiency: data.englishProficiency || "",
+      mobile: data.mobile || "",
+      contactEmail: data.contactEmail || "",
+      dateOfBirth: formatDateForInput(data.dateOfBirth),
+      gender: data.gender || null,
+      maritalStatus: data.maritalStatus as "SINGLE" | "MARRIED" | "DIVORCED" | "WIDOWED" | null || null,
+      nationality: data.nationality || "",
     },
   });
 
   // Auto-save while editing (no per-card buttons)
   useEffect(() => {
-    if (!isEditing || !onSave) return;
     const subscription = form.watch((values) => {
       const parsed = personalSchema.safeParse(values);
       if (!parsed.success) return;
       const v = parsed.data;
-      const personalData: Partial<MockupProfileData> = {
+      const personalData: ProfileDataUpdate = {
         fullName: v.fullName,
         dateOfBirth: v.dateOfBirth ? new Date(v.dateOfBirth) : null,
         gender: v.gender || null,
         maritalStatus: v.maritalStatus || null,
-        mobilePrimary: v.mobilePrimary,
-        email: v.email,
-        englishProficiency: v.englishProficiency,
+        nationality: v.nationality || null,
+        mobile: v.mobile,
+        contactEmail: v.contactEmail,
       };
-      onSave(personalData);
+      onChange(personalData);
     });
     return () => subscription.unsubscribe();
-  }, [isEditing, onSave, form]);
+  }, [form, onChange]);
 
-  const handleCancel = () => {
-    form.reset();
-  };
+  // Always render in edit mode as per Task 2.3
+  return (
+    <Card className="h-full">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-lg font-semibold text-foreground">Personal Information</CardTitle>
+      </CardHeader>
+      <CardContent className="p-6">
+        <Form {...form}>
+          <form className="space-y-6">
+            <FormField
+              control={form.control}
+              name="fullName"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <label className="text-sm font-medium text-muted-foreground">Full Name</label>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter your full name"
+                      {...field}
+                      className="h-11"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-  const { fullName, dateOfBirth, gender, maritalStatus, mobilePrimary, email } = data;
-
-  if (isEditing) {
-    return (
-      <Card className="h-full">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5 text-primary" />
-            Edit Personal Information
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="fullName"
+                name="mobile"
                 render={({ field }) => (
-                  <FormItem className="md:col-span-3">
-                    <FormLabel>Full Name *</FormLabel>
+                  <FormItem className="space-y-2">
+                    <label className="text-sm font-medium text-muted-foreground">Mobile</label>
                     <FormControl>
-                      <Input placeholder="John Michael Doe" {...field} />
+                      <Input
+                        placeholder="Enter mobile number"
+                        {...field}
+                        className="h-11"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -102,40 +121,37 @@ export default function PersonalInfoCard({ data, onSave, isEditing }: PersonalIn
 
               <FormField
                 control={form.control}
-                name="mobilePrimary"
+                name="contactEmail"
                 render={({ field }) => (
-                  <FormItem className="md:col-span-2">
-                    <FormLabel>Primary Mobile *</FormLabel>
+                  <FormItem className="space-y-2">
+                    <label className="text-sm font-medium text-muted-foreground">Contact Email</label>
                     <FormControl>
-                      <Input placeholder="+966-50-123-4567" {...field} />
+                      <Input
+                        type="email"
+                        placeholder="Enter contact email"
+                        {...field}
+                        className="h-11"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+            </div>
 
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem className="md:col-span-1">
-                    <FormLabel>Primary Email *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="email@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="dateOfBirth"
                 render={({ field }) => (
-                  <FormItem className="md:col-span-2">
-                    <FormLabel>Date of Birth *</FormLabel>
+                  <FormItem className="space-y-2">
+                    <label className="text-sm font-medium text-muted-foreground">Date of Birth</label>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input
+                        type="date"
+                        {...field}
+                        className="h-11"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -146,11 +162,11 @@ export default function PersonalInfoCard({ data, onSave, isEditing }: PersonalIn
                 control={form.control}
                 name="gender"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Gender</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormItem className="space-y-2">
+                    <label className="text-sm font-medium text-muted-foreground">Gender</label>
+                    <Select onValueChange={field.onChange} value={field.value || ""}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="h-11">
                           <SelectValue placeholder="Select gender" />
                         </SelectTrigger>
                       </FormControl>
@@ -168,11 +184,11 @@ export default function PersonalInfoCard({ data, onSave, isEditing }: PersonalIn
                 control={form.control}
                 name="maritalStatus"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormItem className="space-y-2">
+                    <label className="text-sm font-medium text-muted-foreground">Marital Status</label>
+                    <Select onValueChange={field.onChange} value={field.value || ""}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="h-11">
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                       </FormControl>
@@ -187,168 +203,27 @@ export default function PersonalInfoCard({ data, onSave, isEditing }: PersonalIn
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={form.control}
-                name="englishProficiency"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>English *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select proficiency level" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="BEGINNER">Beginner</SelectItem>
-                        <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
-                        <SelectItem value="ADVANCED">Advanced</SelectItem>
-                        <SelectItem value="EXPERT">Expert</SelectItem>
-                        <SelectItem value="MASTER">Master</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Global Save/Cancel handled in header */}
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card className="h-full shadow-sm hover:shadow-md transition-all duration-300 border border-border bg-card">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-3 text-lg">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <User className="h-5 w-5 text-primary" />
-          </div>
-          Personal Information
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4 pb-4 flex-1">
-        <div className="space-y-4 h-full">
-          <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-primary/20 transition-colors">
-            <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground mb-1">Full Name</label>
-              <div className="text-sm font-semibold">
-                {fullName ? (
-                  <Badge variant="default" className="text-xs px-3 py-1">
-                    {fullName}
-                  </Badge>
-                ) : (
-                  <span className="text-muted-foreground italic">Not provided</span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-primary/20 transition-colors">
-              <div className="flex-1">
-                <label className="text-sm font-medium text-muted-foreground mb-1">Primary Mobile</label>
-                <div className="text-sm font-semibold">
-                  {mobilePrimary ? (
-                    <Badge variant="default" className="text-xs px-3 py-1">
-                      {mobilePrimary}
-                    </Badge>
-                  ) : (
-                    <span className="text-muted-foreground italic">Not provided</span>
-                  )}
-                </div>
-              </div>
             </div>
 
-            <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-primary/20 transition-colors">
-              <div className="flex-1">
-                <label className="text-sm font-medium text-muted-foreground mb-1">Primary Email</label>
-                <div className="text-sm font-semibold">
-                  {email ? (
-                    <Badge variant="default" className="text-xs px-3 py-1">
-                      {email}
-                    </Badge>
-                  ) : (
-                    <span className="text-muted-foreground italic">Not provided</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-secondary/20 transition-colors">
-              <div className="flex-1">
-                <label className="text-sm font-medium text-muted-foreground mb-1">Date of Birth</label>
-                <div className="text-sm font-semibold">
-                  {dateOfBirth ? (
-                    <Badge variant="secondary" className="text-xs px-3 py-1">
-                      {dateOfBirth.toLocaleDateString()}
-                    </Badge>
-                  ) : (
-                    <span className="text-muted-foreground italic">Not provided</span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-accent/20 transition-colors">
-              <div className="flex-1">
-                <label className="text-sm font-medium text-muted-foreground mb-1">Gender</label>
-                <div className="text-sm font-semibold">
-                  {gender ? (
-                    <Badge variant="outline" className="text-xs px-3 py-1">
-                      {gender}
-                    </Badge>
-                  ) : (
-                    <span className="text-muted-foreground italic">Not provided</span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-primary/20 transition-colors">
-              <div className="flex-1">
-                <label className="text-sm font-medium text-muted-foreground mb-1">Status</label>
-                <div className="text-sm font-semibold">
-                  {maritalStatus ? (
-                    <Badge variant="default" className="text-xs px-3 py-1">
-                      {maritalStatus}
-                    </Badge>
-                  ) : (
-                    <span className="text-muted-foreground italic">Not provided</span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-primary/20 transition-colors">
-              <div className="flex-1">
-                <label className="text-sm font-medium text-muted-foreground mb-1">English</label>
-                <div className="text-sm font-semibold">
-                  {data.englishProficiency ? (
-                    <Badge variant="default" className="text-xs px-3 py-1">
-                      {data.englishProficiency}
-                    </Badge>
-                  ) : (
-                    <span className="text-muted-foreground italic">Not provided</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-
-        </div>
-
-        {onSave && (
-          <div className="pt-3 border-t border-border">
-          </div>
-        )}
+            <FormField
+              control={form.control}
+              name="nationality"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <label className="text-sm font-medium text-muted-foreground">Nationality</label>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter nationality"
+                      {...field}
+                      className="h-11"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
       </CardContent>
     </Card>
   );

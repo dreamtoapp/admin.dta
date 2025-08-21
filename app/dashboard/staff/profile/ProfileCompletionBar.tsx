@@ -3,44 +3,44 @@
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Target } from "lucide-react";
-import { MockupProfileData } from "./mockupData";
+import { ProfileData } from "./types";
 
 interface ProfileCompletionBarProps {
-  data: MockupProfileData;
+  data: ProfileData;
 }
 
 export default function ProfileCompletionBar({ data }: ProfileCompletionBarProps) {
-  // Calculate completion based on required fields
+  // Calculate completion based on required fields (simplified approach)
   const requiredFields = [
-    'fullName', 'dateOfBirth', 'nationality', 'mobilePrimary', 'email',
+    'fullName', 'mobile', 'contactEmail',
     'addressStreet', 'addressCity', 'addressCountry',
     'emergencyContactName', 'emergencyContactPhone', 'emergencyContactRelationship'
   ];
 
   const optionalFields = [
-    'gender', 'profileImage', 'homePhone', 'workExtension', 'alternativeEmail',
-    'generalSkills', 'generalExperience'
+    'dateOfBirth', 'gender', 'maritalStatus', 'nationality', 'profileImage',
+    'documentType', 'documentImage', 'educationSummary', 'workExperienceSummary',
+    'englishProficiency', 'certifications', 'professionalDevelopment'
   ];
 
   const completedRequired = requiredFields.filter(field => {
-    const value = data[field as keyof MockupProfileData];
+    const value = data[field as keyof ProfileData];
     return value && value !== "" && value !== null;
   }).length;
 
   const completedOptional = optionalFields.filter(field => {
-    const value = data[field as keyof MockupProfileData];
+    const value = data[field as keyof ProfileData];
     return value && value !== "" && value !== null;
   }).length;
 
-  // Check if relations have at least one entry
-  const hasLanguages = data.languages && data.languages.length > 0;
-  const hasEducation = data.education && data.education.length > 0;
-  const hasWorkExperience = data.workExperience && data.workExperience.length > 0;
+  // Check if summary fields have content
+  const hasEducation = data.educationSummary && data.educationSummary.trim().length > 0;
+  const hasWorkExperience = data.workExperienceSummary && data.workExperienceSummary.trim().length > 0;
 
-  const totalRequired = requiredFields.length + 3; // +3 for relations
+  const totalRequired = requiredFields.length + 2; // +2 for education and work experience summaries
   const totalOptional = optionalFields.length;
 
-  const completedTotal = completedRequired + (hasLanguages ? 1 : 0) + (hasEducation ? 1 : 0) + (hasWorkExperience ? 1 : 0) + completedOptional;
+  const completedTotal = completedRequired + (hasEducation ? 1 : 0) + (hasWorkExperience ? 1 : 0) + completedOptional;
 
   const completionPercentage = Math.round((completedTotal / (totalRequired + totalOptional)) * 100);
 
@@ -48,6 +48,8 @@ export default function ProfileCompletionBar({ data }: ProfileCompletionBarProps
     <Card className="border-0 shadow-sm">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+          <Target className="h-4 w-4" />
+          Profile Completion
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">

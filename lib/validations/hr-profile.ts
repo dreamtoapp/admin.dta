@@ -135,17 +135,6 @@ export const skillSchema = z.object({
 
 export type SkillData = z.infer<typeof skillSchema>;
 
-// Language Schema
-export const languageSchema = z.object({
-  language: z.string()
-    .min(2, "Language must be at least 2 characters")
-    .max(50, "Language must be less than 50 characters"),
-  proficiency: z.enum(["BASIC", "INTERMEDIATE", "ADVANCED", "FLUENT"]),
-  certified: z.boolean()
-});
-
-export type LanguageData = z.infer<typeof languageSchema>;
-
 // Education Schema
 export const educationSchema = z.object({
   degree: z.string()
@@ -189,20 +178,30 @@ export const workExperienceSchema = z.object({
 
 export type WorkExperienceData = z.infer<typeof workExperienceSchema>;
 
-// Profile Update Schema (for main user API)
+// Profile Update Schema (for main user API) - SIMPLIFIED
 export const profileUpdateSchema = z.object({
   // Personal Information
   fullName: personalInfoSchema.shape.fullName.optional(),
   dateOfBirth: personalInfoSchema.shape.dateOfBirth.optional(),
   gender: personalInfoSchema.shape.gender.optional(),
+  maritalStatus: z.string().optional(),
   nationality: personalInfoSchema.shape.nationality.optional(),
   profileImage: personalInfoSchema.shape.profileImage.optional(),
 
-  // Contact Information
-  mobilePrimary: contactInfoSchema.shape.mobilePrimary.optional(),
-  homePhone: contactInfoSchema.shape.homePhone.optional(),
-  workExtension: contactInfoSchema.shape.workExtension.optional(),
-  alternativeEmail: contactInfoSchema.shape.alternativeEmail.optional(),
+  // Contact Information (SIMPLIFIED)
+  mobile: z.string().optional(),
+  contactEmail: z.string().email("Invalid email address").optional(),
+
+  // Education & Skills (SIMPLIFIED)
+  educationSummary: z.string().optional(),
+  workExperienceSummary: z.string().optional(),
+  englishProficiency: z.string().optional(),
+  certifications: z.string().optional(),
+  professionalDevelopment: z.string().optional(),
+
+  // Official Documents
+  documentType: z.enum(["ID_CARD", "PASSPORT"]).optional(),
+  documentImage: z.string().optional(),
 
   // Employment Information
   hireDate: employmentInfoSchema.shape.hireDate.optional(),
@@ -241,10 +240,6 @@ export const validateEmploymentInfo = (data: unknown) => {
 
 export const validateSkill = (data: unknown) => {
   return skillSchema.safeParse(data);
-};
-
-export const validateLanguage = (data: unknown) => {
-  return languageSchema.safeParse(data);
 };
 
 export const validateEducation = (data: unknown) => {
