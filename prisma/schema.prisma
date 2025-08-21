@@ -91,17 +91,30 @@ model User {
   documentType     DocumentType? // ID_CARD, PASSPORT
   documentImage    String? // URL to document image
 
-  // Education & Skills (Simple text fields)
+  // Education & Skills (Enhanced fields)
   educationLevel   String?
   fieldOfStudy     String?
-  generalSkills    String? // General skills as text
-  generalExperience String? // General experience as text
+  institution      String?
+  graduationYear   String?
+  gpa              Float?
+  generalSkills    String? // Core skills as text
+  technicalSkills  String? // Technical specializations
+  softSkills       String? // Soft skills and leadership
+  generalExperience String? // Experience summary as text
+  yearsOfExperience String? // Years of experience
+  specializations  String? // Industry focus areas
   englishProficiency String?
+  arabicProficiency String?
+  otherLanguages   String?
+  certifications   String? // Professional certifications
+  professionalDevelopment String? // Continuous learning
 
   // Address (flattened)
   addressStreet    String?
   addressCity      String?
   addressCountry   String?
+  latitude         Float?
+  longitude        Float?
 
   // Emergency Contact (flattened)
   emergencyContactName          String?

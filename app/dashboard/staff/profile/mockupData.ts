@@ -44,12 +44,23 @@ export interface MockupProfileData {
   documentType: string | null; // ID_CARD, PASSPORT
   documentImage: string | null; // URL to document image
 
-  // Education & Skills (Simple text fields)
+  // Education & Skills (Enhanced fields)
   educationLevel: string | null;
   fieldOfStudy: string | null;
-  generalSkills: string | null; // General skills as text
-  generalExperience: string | null; // General experience as text
+  institution: string | null;
+  graduationYear: string | null;
+  gpa: number | null;
+  generalSkills: string | null; // Core skills as text
+  technicalSkills: string | null; // Technical specializations
+  softSkills: string | null; // Soft skills and leadership
+  generalExperience: string | null; // Experience summary as text
+  yearsOfExperience: string | null; // Years of experience
+  specializations: string | null; // Industry focus areas
   englishProficiency: string | null;
+  arabicProficiency: string | null;
+  otherLanguages: string | null;
+  certifications: string | null; // Professional certifications
+  professionalDevelopment: string | null; // Continuous learning
 
   // Address (flattened)
   addressStreet: string | null;
@@ -148,12 +159,23 @@ export const mockupProfileData: MockupProfileData = {
   documentType: "ID_CARD",
   documentImage: "/api/placeholder/400/250",
 
-  // Education & Skills
+  // Education & Skills (Enhanced)
   educationLevel: "Bachelor's Degree",
   fieldOfStudy: "Computer Science",
-  generalSkills: "React, TypeScript, Next.js, Tailwind CSS, Node.js, MongoDB",
-  generalExperience: "5+ years in web development, 3+ years in React ecosystem, 2+ years in Node.js backend development",
-  englishProficiency: "Advanced",
+  institution: "King Saud University",
+  graduationYear: "2014",
+  gpa: 3.8,
+  generalSkills: "React, TypeScript, Next.js, Tailwind CSS, Node.js, MongoDB, AWS, Docker, Git",
+  technicalSkills: "Full-stack development, Microservices architecture, CI/CD pipelines, Performance optimization",
+  softSkills: "Team leadership, Project management, Client communication, Problem-solving, Strategic thinking",
+  generalExperience: "5+ years in full-stack web development, 3+ years leading development teams, 2+ years in cloud architecture and DevOps practices. Specialized in scalable applications and performance optimization.",
+  yearsOfExperience: "7-10",
+  specializations: "E-commerce, FinTech, Healthcare",
+  englishProficiency: "ADVANCED",
+  arabicProficiency: "NATIVE",
+  otherLanguages: "French (Intermediate)",
+  certifications: "AWS Certified Solutions Architect, Google Cloud Professional Developer, Scrum Master",
+  professionalDevelopment: "Ongoing courses in AI/ML, attending tech conferences, mentoring junior developers",
 
   // Address
   addressStreet: "King Fahd Road, Al Olaya District",

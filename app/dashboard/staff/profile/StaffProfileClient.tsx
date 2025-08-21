@@ -13,7 +13,9 @@ import { MockupProfileData, mockupProfileData, calculateProfileCompletion } from
 import ProfileCompletionBar from "./ProfileCompletionBar";
 import PersonalInfoCard from "./PersonalInfoCard";
 import ContactInfoCard from "./ContactInfoCard";
-import SkillsCard from "./SkillsCard";
+
+import EducationCard from "./EducationCard";
+import WorkExperienceCard from "./WorkExperienceCard";
 import OfficialDocumentsCard from "./OfficialDocumentsCard";
 
 export default function StaffProfileClient() {
@@ -104,7 +106,7 @@ export default function StaffProfileClient() {
         // Emergency
         "emergencyContactName", "emergencyContactPhone", "emergencyContactRelationship",
         // Education & Skills
-        "educationLevel", "fieldOfStudy", "generalSkills", "generalExperience", "englishProficiency",
+        "educationLevel", "fieldOfStudy", "institution", "graduationYear", "gpa",
         // Official Docs
         "documentType", "documentImage",
         // Admin fields (will be ignored server-side if not admin)
@@ -381,9 +383,12 @@ export default function StaffProfileClient() {
           <ContactInfoCard data={profileData} onSave={handleSaveProfile} isEditing={isEditing} />
         </div>
 
-        {/* Row 3: Skills full width */}
-        <div className="col-span-1 lg:col-span-3 space-y-0">
-          <SkillsCard data={profileData} onSave={handleSaveProfile} isEditing={isEditing} />
+        {/* Row 3: Education & Experience */}
+        <div className="col-span-1 lg:col-span-3 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <EducationCard data={profileData} onSave={handleSaveProfile} isEditing={isEditing} />
+            <WorkExperienceCard data={profileData} onSave={handleSaveProfile} isEditing={isEditing} />
+          </div>
         </div>
       </div>
     </div>

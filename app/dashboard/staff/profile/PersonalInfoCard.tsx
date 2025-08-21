@@ -26,6 +26,7 @@ const personalSchema = z.object({
   maritalStatus: z.string().optional().or(z.literal("")),
   mobilePrimary: z.string().min(1, "Primary mobile is required"),
   email: z.string().min(1, "Primary email is required").email("Invalid email format"),
+  englishProficiency: z.string().min(1, "English proficiency is required"),
 });
 
 type PersonalFormValues = z.infer<typeof personalSchema>;
@@ -42,6 +43,7 @@ export default function PersonalInfoCard({ data, onSave, isEditing }: PersonalIn
       maritalStatus: data.maritalStatus || "",
       mobilePrimary: data.mobilePrimary || "",
       email: data.email || "",
+      englishProficiency: data.englishProficiency || "",
     },
   });
 
@@ -59,6 +61,7 @@ export default function PersonalInfoCard({ data, onSave, isEditing }: PersonalIn
         maritalStatus: v.maritalStatus || null,
         mobilePrimary: v.mobilePrimary,
         email: v.email,
+        englishProficiency: v.englishProficiency,
       };
       onSave(personalData);
     });
@@ -82,7 +85,7 @@ export default function PersonalInfoCard({ data, onSave, isEditing }: PersonalIn
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <form className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <FormField
                 control={form.control}
                 name="fullName"
@@ -129,7 +132,7 @@ export default function PersonalInfoCard({ data, onSave, isEditing }: PersonalIn
                 control={form.control}
                 name="dateOfBirth"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="md:col-span-2">
                     <FormLabel>Date of Birth *</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
@@ -166,11 +169,11 @@ export default function PersonalInfoCard({ data, onSave, isEditing }: PersonalIn
                 name="maritalStatus"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Marital Status</FormLabel>
+                    <FormLabel>Status</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select marital status" />
+                          <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -185,7 +188,30 @@ export default function PersonalInfoCard({ data, onSave, isEditing }: PersonalIn
                 )}
               />
 
-
+              <FormField
+                control={form.control}
+                name="englishProficiency"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>English *</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select proficiency level" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="BEGINNER">Beginner</SelectItem>
+                        <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
+                        <SelectItem value="ADVANCED">Advanced</SelectItem>
+                        <SelectItem value="EXPERT">Expert</SelectItem>
+                        <SelectItem value="MASTER">Master</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               {/* Global Save/Cancel handled in header */}
             </form>
@@ -208,9 +234,6 @@ export default function PersonalInfoCard({ data, onSave, isEditing }: PersonalIn
       <CardContent className="space-y-4 pb-4 flex-1">
         <div className="space-y-4 h-full">
           <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-primary/20 transition-colors">
-            <div className="p-2 bg-primary/10 rounded-full">
-              <User className="h-4 w-4 text-primary" />
-            </div>
             <div className="flex-1">
               <label className="text-sm font-medium text-muted-foreground mb-1">Full Name</label>
               <div className="text-sm font-semibold">
@@ -227,9 +250,6 @@ export default function PersonalInfoCard({ data, onSave, isEditing }: PersonalIn
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-primary/20 transition-colors">
-              <div className="p-2 bg-primary/10 rounded-full">
-                <User className="h-4 w-4 text-primary" />
-              </div>
               <div className="flex-1">
                 <label className="text-sm font-medium text-muted-foreground mb-1">Primary Mobile</label>
                 <div className="text-sm font-semibold">
@@ -245,9 +265,6 @@ export default function PersonalInfoCard({ data, onSave, isEditing }: PersonalIn
             </div>
 
             <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-primary/20 transition-colors">
-              <div className="p-2 bg-primary/10 rounded-full">
-                <User className="h-4 w-4 text-primary" />
-              </div>
               <div className="flex-1">
                 <label className="text-sm font-medium text-muted-foreground mb-1">Primary Email</label>
                 <div className="text-sm font-semibold">
@@ -263,11 +280,8 @@ export default function PersonalInfoCard({ data, onSave, isEditing }: PersonalIn
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-secondary/20 transition-colors">
-              <div className="p-2 bg-secondary/10 rounded-full">
-                <Calendar className="h-4 w-4 text-secondary" />
-              </div>
               <div className="flex-1">
                 <label className="text-sm font-medium text-muted-foreground mb-1">Date of Birth</label>
                 <div className="text-sm font-semibold">
@@ -283,9 +297,6 @@ export default function PersonalInfoCard({ data, onSave, isEditing }: PersonalIn
             </div>
 
             <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-accent/20 transition-colors">
-              <div className="p-2 bg-accent/10 rounded-full">
-                <User className="h-4 w-4 text-accent" />
-              </div>
               <div className="flex-1">
                 <label className="text-sm font-medium text-muted-foreground mb-1">Gender</label>
                 <div className="text-sm font-semibold">
@@ -301,15 +312,27 @@ export default function PersonalInfoCard({ data, onSave, isEditing }: PersonalIn
             </div>
 
             <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-primary/20 transition-colors">
-              <div className="p-2 bg-primary/10 rounded-full">
-                <User className="h-4 w-4 text-primary" />
-              </div>
               <div className="flex-1">
-                <label className="text-sm font-medium text-muted-foreground mb-1">Marital Status</label>
+                <label className="text-sm font-medium text-muted-foreground mb-1">Status</label>
                 <div className="text-sm font-semibold">
                   {maritalStatus ? (
                     <Badge variant="default" className="text-xs px-3 py-1">
                       {maritalStatus}
+                    </Badge>
+                  ) : (
+                    <span className="text-muted-foreground italic">Not provided</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-primary/20 transition-colors">
+              <div className="flex-1">
+                <label className="text-sm font-medium text-muted-foreground mb-1">English</label>
+                <div className="text-sm font-semibold">
+                  {data.englishProficiency ? (
+                    <Badge variant="default" className="text-xs px-3 py-1">
+                      {data.englishProficiency}
                     </Badge>
                   ) : (
                     <span className="text-muted-foreground italic">Not provided</span>

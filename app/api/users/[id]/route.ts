@@ -139,9 +139,20 @@ export async function PUT(
     // Education & Skills (Staff editable)
     if (updateData.educationLevel !== undefined) updateFields.educationLevel = updateData.educationLevel;
     if (updateData.fieldOfStudy !== undefined) updateFields.fieldOfStudy = updateData.fieldOfStudy;
+    if ((updateData as any).institution !== undefined) updateFields.institution = (updateData as any).institution;
+    if ((updateData as any).graduationYear !== undefined) updateFields.graduationYear = (updateData as any).graduationYear;
+    if ((updateData as any).gpa !== undefined) updateFields.gpa = (updateData as any).gpa ? parseFloat((updateData as any).gpa) : null;
     if (updateData.generalSkills !== undefined) updateFields.generalSkills = updateData.generalSkills;
+    if ((updateData as any).technicalSkills !== undefined) updateFields.technicalSkills = (updateData as any).technicalSkills;
+    if ((updateData as any).softSkills !== undefined) updateFields.softSkills = (updateData as any).softSkills;
     if (updateData.generalExperience !== undefined) updateFields.generalExperience = updateData.generalExperience;
+    if ((updateData as any).yearsOfExperience !== undefined) updateFields.yearsOfExperience = (updateData as any).yearsOfExperience;
+    if ((updateData as any).specializations !== undefined) updateFields.specializations = (updateData as any).specializations;
     if ((updateData as any).englishProficiency !== undefined) updateFields.englishProficiency = (updateData as any).englishProficiency;
+    if ((updateData as any).arabicProficiency !== undefined) updateFields.arabicProficiency = (updateData as any).arabicProficiency;
+    if ((updateData as any).otherLanguages !== undefined) updateFields.otherLanguages = (updateData as any).otherLanguages;
+    if ((updateData as any).certifications !== undefined) updateFields.certifications = (updateData as any).certifications;
+    if ((updateData as any).professionalDevelopment !== undefined) updateFields.professionalDevelopment = (updateData as any).professionalDevelopment;
 
     // Official Documents (Staff editable)
     if (updateData.documentType !== undefined) updateFields.documentType = updateData.documentType;

@@ -97,6 +97,7 @@ export default function ContactInfoCard({ data, onSave, isEditing }: ContactInfo
       emergencyContactName: data.emergencyContactName || "",
       emergencyContactPhone: data.emergencyContactPhone || "",
       emergencyContactRelationship: data.emergencyContactRelationship || "",
+
     },
   });
 
@@ -119,6 +120,7 @@ export default function ContactInfoCard({ data, onSave, isEditing }: ContactInfo
             emergencyContactName: v.emergencyContactName || "",
             emergencyContactPhone: v.emergencyContactPhone || "",
             emergencyContactRelationship: v.emergencyContactRelationship || "",
+
           };
           onSave(contactData);
         } catch (error) {
@@ -461,6 +463,8 @@ export default function ContactInfoCard({ data, onSave, isEditing }: ContactInfo
               </div>
             </div>
 
+
+
             {/* Global Save/Cancel handled in header */}
           </Form>
         </CardContent>
@@ -611,6 +615,8 @@ export default function ContactInfoCard({ data, onSave, isEditing }: ContactInfo
               </div>
             </div>
           </div>
+
+
 
           {onSave && (
             <div className="pt-3 border-t border-border">
