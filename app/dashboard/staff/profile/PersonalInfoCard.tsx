@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,20 +16,20 @@ import { MockupProfileData } from "./mockupData";
 interface PersonalInfoCardProps {
   data: MockupProfileData;
   onSave?: (data: Partial<MockupProfileData>) => void;
+  isEditing: boolean;
 }
 
 const personalSchema = z.object({
   fullName: z.string().min(1, "Full name is required"),
   dateOfBirth: z.string().min(1, "Date of birth is required"),
-  gender: z.enum(["MALE", "FEMALE"]).optional().or(z.literal("")),
-  maritalStatus: z.enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"]).optional().or(z.literal("")),
+  gender: z.string().optional().or(z.literal("")),
+  maritalStatus: z.string().optional().or(z.literal("")),
   nationality: z.string().min(1, "Nationality is required"),
 });
 
 type PersonalFormValues = z.infer<typeof personalSchema>;
 
-export default function PersonalInfoCard({ data, onSave }: PersonalInfoCardProps) {
-  const [isEditing, setIsEditing] = useState(false);
+export default function PersonalInfoCard({ data, onSave, isEditing }: PersonalInfoCardProps) {
   const [saving, setSaving] = useState(false);
 
   const form = useForm<PersonalFormValues>({
@@ -43,31 +43,26 @@ export default function PersonalInfoCard({ data, onSave }: PersonalInfoCardProps
     },
   });
 
-  const onSubmit = async (values: PersonalFormValues) => {
-    if (!onSave) return;
-
-    setSaving(true);
-    try {
+  // Auto-save while editing (no per-card buttons)
+  useEffect(() => {
+    if (!isEditing || !onSave) return;
+    const subscription = form.watch((values) => {
+      const parsed = personalSchema.safeParse(values);
+      if (!parsed.success) return;
+      const v = parsed.data;
       const personalData: Partial<MockupProfileData> = {
-        fullName: values.fullName,
-        dateOfBirth: values.dateOfBirth ? new Date(values.dateOfBirth) : null,
-        gender: values.gender as "MALE" | "FEMALE" | null || null,
-        maritalStatus: values.maritalStatus as "SINGLE" | "MARRIED" | "DIVORCED" | "WIDOWED" | null || null,
-        nationality: values.nationality,
+        fullName: v.fullName,
+        dateOfBirth: v.dateOfBirth ? new Date(v.dateOfBirth) : null,
+        gender: v.gender || null,
+        maritalStatus: v.maritalStatus || null,
+        nationality: v.nationality,
       };
-
-      await onSave(personalData);
-      setIsEditing(false);
-      form.reset(values);
-    } catch (error) {
-      console.error("Failed to save personal info:", error);
-    } finally {
-      setSaving(false);
-    }
-  };
+      onSave(personalData);
+    });
+    return () => subscription.unsubscribe();
+  }, [isEditing, onSave, form]);
 
   const handleCancel = () => {
-    setIsEditing(false);
     form.reset();
   };
 
@@ -84,12 +79,12 @@ export default function PersonalInfoCard({ data, onSave }: PersonalInfoCardProps
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="fullName"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="md:col-span-2">
                     <FormLabel>Full Name *</FormLabel>
                     <FormControl>
                       <Input placeholder="John Michael Doe" {...field} />
@@ -173,16 +168,7 @@ export default function PersonalInfoCard({ data, onSave }: PersonalInfoCardProps
                 )}
               />
 
-              <div className="flex gap-2 pt-4">
-                <Button type="submit" disabled={saving} className="flex-1">
-                  <Save className="h-4 w-4 mr-2" />
-                  {saving ? "Saving..." : "Save Changes"}
-                </Button>
-                <Button type="button" variant="outline" onClick={handleCancel}>
-                  <X className="h-4 w-4 mr-2" />
-                  Cancel
-                </Button>
-              </div>
+              {/* Global Save/Cancel handled in header */}
             </form>
           </Form>
         </CardContent>
@@ -191,100 +177,102 @@ export default function PersonalInfoCard({ data, onSave }: PersonalInfoCardProps
   }
 
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <User className="h-5 w-5 text-primary" />
+    <Card className="h-fit shadow-sm hover:shadow-md transition-all duration-300 border border-border bg-card">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-3 text-lg">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <User className="h-5 w-5 text-primary" />
+          </div>
           Personal Information
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pb-4">
         <div className="space-y-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-primary/20 transition-colors">
             <div className="p-2 bg-primary/10 rounded-full">
               <User className="h-4 w-4 text-primary" />
             </div>
             <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground">Full Name</label>
-              <div className="text-sm font-medium">
+              <label className="text-sm font-medium text-muted-foreground mb-1">Full Name</label>
+              <div className="text-sm font-semibold">
                 {fullName ? (
-                  <Badge variant="default" className="text-xs">
+                  <Badge variant="default" className="text-xs px-3 py-1">
                     {fullName}
                   </Badge>
                 ) : (
-                  "Not provided"
+                  <span className="text-muted-foreground italic">Not provided</span>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-secondary/20 transition-colors">
             <div className="p-2 bg-secondary/10 rounded-full">
               <Calendar className="h-4 w-4 text-secondary" />
             </div>
             <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground">Date of Birth</label>
-              <div className="text-sm font-medium">
+              <label className="text-sm font-medium text-muted-foreground mb-1">Date of Birth</label>
+              <div className="text-sm font-semibold">
                 {dateOfBirth ? (
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge variant="secondary" className="text-xs px-3 py-1">
                     {dateOfBirth.toLocaleDateString()}
                   </Badge>
                 ) : (
-                  "Not provided"
+                  <span className="text-muted-foreground italic">Not provided</span>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-accent/20 transition-colors">
             <div className="p-2 bg-accent/10 rounded-full">
               <User className="h-4 w-4 text-accent" />
             </div>
             <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground">Gender</label>
-              <div className="text-sm font-medium">
+              <label className="text-sm font-medium text-muted-foreground mb-1">Gender</label>
+              <div className="text-sm font-semibold">
                 {gender ? (
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="text-xs px-3 py-1">
                     {gender}
                   </Badge>
                 ) : (
-                  "Not provided"
+                  <span className="text-muted-foreground italic">Not provided</span>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-primary/20 transition-colors">
             <div className="p-2 bg-primary/10 rounded-full">
               <User className="h-4 w-4 text-primary" />
             </div>
             <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground">Marital Status</label>
-              <div className="text-sm font-medium">
+              <label className="text-sm font-medium text-muted-foreground mb-1">Marital Status</label>
+              <div className="text-sm font-semibold">
                 {maritalStatus ? (
-                  <Badge variant="default" className="text-xs">
+                  <Badge variant="default" className="text-xs px-3 py-1">
                     {maritalStatus}
                   </Badge>
                 ) : (
-                  "Not provided"
+                  <span className="text-muted-foreground italic">Not provided</span>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-destructive/20 transition-colors">
             <div className="p-2 bg-destructive/10 rounded-full">
               <Globe className="h-4 w-4 text-destructive" />
             </div>
             <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground">Nationality</label>
-              <div className="text-sm font-medium">
+              <label className="text-sm font-medium text-muted-foreground mb-1">Nationality</label>
+              <div className="text-sm font-semibold">
                 {nationality ? (
-                  <Badge variant="destructive" className="text-xs">
+                  <Badge variant="destructive" className="text-xs px-3 py-1">
                     {nationality}
                   </Badge>
                 ) : (
-                  "Not provided"
+                  <span className="text-muted-foreground italic">Not provided</span>
                 )}
               </div>
             </div>
@@ -292,15 +280,7 @@ export default function PersonalInfoCard({ data, onSave }: PersonalInfoCardProps
         </div>
 
         {onSave && (
-          <div className="pt-4 border-t">
-            <Button
-              onClick={() => setIsEditing(true)}
-              className="w-full"
-              variant="outline"
-            >
-              <Edit2 className="h-4 w-4 mr-2" />
-              Edit Personal Info
-            </Button>
+          <div className="pt-3 border-t border-border">
           </div>
         )}
       </CardContent>

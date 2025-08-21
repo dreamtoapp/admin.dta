@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,6 +16,7 @@ import { MockupProfileData } from "./mockupData";
 interface SkillsCardProps {
   data: MockupProfileData;
   onSave?: (data: Partial<MockupProfileData>) => void;
+  isEditing: boolean;
 }
 
 const skillsSchema = z.object({
@@ -28,8 +29,7 @@ const skillsSchema = z.object({
 
 type SkillsFormValues = z.infer<typeof skillsSchema>;
 
-export default function SkillsCard({ data, onSave }: SkillsCardProps) {
-  const [isEditing, setIsEditing] = useState(false);
+export default function SkillsCard({ data, onSave, isEditing }: SkillsCardProps) {
   const [saving, setSaving] = useState(false);
 
   const form = useForm<SkillsFormValues>({
@@ -43,31 +43,26 @@ export default function SkillsCard({ data, onSave }: SkillsCardProps) {
     },
   });
 
-  const onSubmit = async (values: SkillsFormValues) => {
-    if (!onSave) return;
-
-    setSaving(true);
-    try {
+  // Auto-save while editing
+  useEffect(() => {
+    if (!isEditing || !onSave) return;
+    const subscription = form.watch((values) => {
+      const parsed = skillsSchema.safeParse(values);
+      if (!parsed.success) return;
+      const v = parsed.data;
       const skillsData: Partial<MockupProfileData> = {
-        generalSkills: values.generalSkills,
-        generalExperience: values.generalExperience,
-        englishProficiency: values.englishProficiency,
-        educationLevel: values.educationLevel,
-        fieldOfStudy: values.fieldOfStudy,
+        generalSkills: v.generalSkills,
+        generalExperience: v.generalExperience,
+        englishProficiency: v.englishProficiency,
+        educationLevel: v.educationLevel,
+        fieldOfStudy: v.fieldOfStudy,
       };
-
-      await onSave(skillsData);
-      setIsEditing(false);
-      form.reset(values);
-    } catch (error) {
-      console.error("Failed to save skills info:", error);
-    } finally {
-      setSaving(false);
-    }
-  };
+      onSave(skillsData);
+    });
+    return () => subscription.unsubscribe();
+  }, [isEditing, onSave, form]);
 
   const handleCancel = () => {
-    setIsEditing(false);
     form.reset();
   };
 
@@ -84,7 +79,7 @@ export default function SkillsCard({ data, onSave }: SkillsCardProps) {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form className="space-y-4">
               <FormField
                 control={form.control}
                 name="generalSkills"
@@ -168,16 +163,7 @@ export default function SkillsCard({ data, onSave }: SkillsCardProps) {
                 )}
               />
 
-              <div className="flex gap-2 pt-4">
-                <Button type="submit" disabled={saving} className="flex-1">
-                  <Save className="h-4 w-4 mr-2" />
-                  {saving ? "Saving..." : "Save Changes"}
-                </Button>
-                <Button type="button" variant="outline" onClick={handleCancel}>
-                  <X className="h-4 w-4 mr-2" />
-                  Cancel
-                </Button>
-              </div>
+              {/* Global Save/Cancel handled in header */}
             </form>
           </Form>
         </CardContent>
@@ -186,96 +172,98 @@ export default function SkillsCard({ data, onSave }: SkillsCardProps) {
   }
 
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Brain className="h-5 w-5 text-primary" />
+    <Card className="h-fit shadow-sm hover:shadow-md transition-all duration-300 border border-border bg-card">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-3 text-lg">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <Brain className="h-5 w-5 text-primary" />
+          </div>
           Skills, Experience & Education
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pb-4">
         <div className="space-y-4">
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-secondary/20 transition-colors">
             <div className="p-2 bg-secondary/10 rounded-full mt-1">
               <Brain className="h-4 w-4 text-secondary" />
             </div>
             <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground">Skills</label>
-              <div className="text-sm font-medium mt-1">
+              <label className="text-sm font-medium text-muted-foreground mb-2">Skills</label>
+              <div className="text-sm font-semibold">
                 {generalSkills ? (
-                  <div className="bg-secondary/10 p-3 rounded-md">
+                  <div className="bg-muted/50 p-3 rounded-md border border-border">
                     {generalSkills}
                   </div>
                 ) : (
-                  "Not provided"
+                  <span className="text-muted-foreground italic">Not provided</span>
                 )}
               </div>
             </div>
           </div>
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-secondary/20 transition-colors">
             <div className="p-2 bg-secondary/10 rounded-full mt-1">
               <Brain className="h-4 w-4 text-secondary" />
             </div>
             <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground">Experience Summary</label>
-              <div className="text-sm font-medium mt-1">
+              <label className="text-sm font-medium text-muted-foreground mb-2">Experience Summary</label>
+              <div className="text-sm font-semibold">
                 {generalExperience ? (
-                  <div className="bg-secondary/10 p-3 rounded-md">
+                  <div className="bg-muted/50 p-3 rounded-md border border-border">
                     {generalExperience}
                   </div>
                 ) : (
-                  "Not provided"
+                  <span className="text-muted-foreground italic">Not provided</span>
                 )}
               </div>
             </div>
           </div>
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-secondary/20 transition-colors">
             <div className="p-2 bg-secondary/10 rounded-full mt-1">
               <Brain className="h-4 w-4 text-secondary" />
             </div>
             <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground">English Proficiency</label>
-              <div className="text-sm font-medium mt-1">
+              <label className="text-sm font-medium text-muted-foreground mb-2">English Proficiency</label>
+              <div className="text-sm font-semibold">
                 {englishProficiency ? (
-                  <div className="bg-secondary/10 p-3 rounded-md">
+                  <div className="bg-muted/50 p-3 rounded-md border border-border">
                     {englishProficiency}
                   </div>
                 ) : (
-                  "Not provided"
+                  <span className="text-muted-foreground italic">Not provided</span>
                 )}
               </div>
             </div>
           </div>
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-secondary/20 transition-colors">
             <div className="p-2 bg-secondary/10 rounded-full mt-1">
               <Brain className="h-4 w-4 text-secondary" />
             </div>
             <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground">Education Level</label>
-              <div className="text-sm font-medium mt-1">
+              <label className="text-sm font-medium text-muted-foreground mb-2">Education Level</label>
+              <div className="text-sm font-semibold">
                 {educationLevel ? (
-                  <div className="bg-secondary/10 p-3 rounded-md">
+                  <div className="bg-muted/50 p-3 rounded-md border border-border">
                     {educationLevel}
                   </div>
                 ) : (
-                  "Not provided"
+                  <span className="text-muted-foreground italic">Not provided</span>
                 )}
               </div>
             </div>
           </div>
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-secondary/20 transition-colors">
             <div className="p-2 bg-secondary/10 rounded-full mt-1">
               <Brain className="h-4 w-4 text-secondary" />
             </div>
             <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground">Field of Study</label>
-              <div className="text-sm font-medium mt-1">
+              <label className="text-sm font-medium text-muted-foreground mb-2">Field of Study</label>
+              <div className="text-sm font-semibold">
                 {fieldOfStudy ? (
-                  <div className="bg-secondary/10 p-3 rounded-md">
+                  <div className="bg-muted/50 p-3 rounded-md border border-border">
                     {fieldOfStudy}
                   </div>
                 ) : (
-                  "Not provided"
+                  <span className="text-muted-foreground italic">Not provided</span>
                 )}
               </div>
             </div>
@@ -283,15 +271,7 @@ export default function SkillsCard({ data, onSave }: SkillsCardProps) {
         </div>
 
         {onSave && (
-          <div className="pt-4 border-t">
-            <Button
-              onClick={() => setIsEditing(true)}
-              className="w-full"
-              variant="outline"
-            >
-              <Edit2 className="h-4 w-4 mr-2" />
-              Edit Skills, Experience & Education
-            </Button>
+          <div className="pt-3 border-t border-border">
           </div>
         )}
       </CardContent>

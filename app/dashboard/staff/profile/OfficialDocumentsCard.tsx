@@ -9,32 +9,31 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { MapPin, Edit2, Save, X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FileText, Edit2, Save, X, Eye } from "lucide-react";
 import { MockupProfileData } from "./mockupData";
 
-interface AddressCardProps {
+interface OfficialDocumentsCardProps {
   data: MockupProfileData;
   onSave?: (data: Partial<MockupProfileData>) => void;
   isEditing: boolean;
 }
 
-const addressSchema = z.object({
-  addressStreet: z.string().min(1, "Street address is required"),
-  addressCity: z.string().min(1, "City is required"),
-  addressCountry: z.string().min(1, "Country is required"),
+const officialDocumentsSchema = z.object({
+  documentType: z.enum(["ID_CARD", "PASSPORT"]).optional().or(z.literal("")),
+  documentImage: z.string().min(1, "Document image URL is required"),
 });
 
-type AddressFormValues = z.infer<typeof addressSchema>;
+type OfficialDocumentsFormValues = z.infer<typeof officialDocumentsSchema>;
 
-export default function AddressCard({ data, onSave, isEditing }: AddressCardProps) {
+export default function OfficialDocumentsCard({ data, onSave, isEditing }: OfficialDocumentsCardProps) {
   const [saving, setSaving] = useState(false);
 
-  const form = useForm<AddressFormValues>({
-    resolver: zodResolver(addressSchema),
+  const form = useForm<OfficialDocumentsFormValues>({
+    resolver: zodResolver(officialDocumentsSchema),
     defaultValues: {
-      addressStreet: data.addressStreet || "",
-      addressCity: data.addressCity || "",
-      addressCountry: data.addressCountry || "",
+      documentType: data.documentType || "",
+      documentImage: data.documentImage || "",
     },
   });
 
@@ -42,15 +41,14 @@ export default function AddressCard({ data, onSave, isEditing }: AddressCardProp
   useEffect(() => {
     if (!isEditing || !onSave) return;
     const subscription = form.watch((values) => {
-      const parsed = addressSchema.safeParse(values);
+      const parsed = officialDocumentsSchema.safeParse(values);
       if (!parsed.success) return;
-      const v = parsed.data;
-      const addressData: Partial<MockupProfileData> = {
-        addressStreet: v.addressStreet,
-        addressCity: v.addressCity,
-        addressCountry: v.addressCountry,
+      const v = parsed.data as OfficialDocumentsFormValues;
+      const officialDocumentsData: Partial<MockupProfileData> = {
+        documentType: (v.documentType as "ID_CARD" | "PASSPORT") || null,
+        documentImage: v.documentImage,
       };
-      onSave(addressData);
+      onSave(officialDocumentsData);
     });
     return () => subscription.unsubscribe();
   }, [isEditing, onSave, form]);
@@ -59,15 +57,15 @@ export default function AddressCard({ data, onSave, isEditing }: AddressCardProp
     form.reset();
   };
 
-  const { addressStreet, addressCity, addressCountry } = data;
+  const { documentType, documentImage } = data;
 
   if (isEditing) {
     return (
       <Card className="h-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-primary" />
-            Edit Address Information
+            <FileText className="h-5 w-5 text-primary" />
+            Edit Official Documents
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -75,13 +73,21 @@ export default function AddressCard({ data, onSave, isEditing }: AddressCardProp
             <form className="space-y-4">
               <FormField
                 control={form.control}
-                name="addressStreet"
+                name="documentType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Street Address *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="King Fahd Road, Al Olaya District" {...field} />
-                    </FormControl>
+                    <FormLabel>Document Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select document type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="ID_CARD">ID Card</SelectItem>
+                        <SelectItem value="PASSPORT">Passport</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -89,26 +95,12 @@ export default function AddressCard({ data, onSave, isEditing }: AddressCardProp
 
               <FormField
                 control={form.control}
-                name="addressCity"
+                name="documentImage"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>City *</FormLabel>
+                    <FormLabel>Document Image URL *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Riyadh" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="addressCountry"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Country *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Saudi Arabia" {...field} />
+                      <Input placeholder="https://example.com/document.jpg" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -128,23 +120,23 @@ export default function AddressCard({ data, onSave, isEditing }: AddressCardProp
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-3 text-lg">
           <div className="p-2 bg-primary/10 rounded-lg">
-            <MapPin className="h-5 w-5 text-primary" />
+            <FileText className="h-5 w-5 text-primary" />
           </div>
-          Address Information
+          Official Documents
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4 pb-4">
         <div className="space-y-4">
           <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-primary/20 transition-colors">
             <div className="p-2 bg-primary/10 rounded-full">
-              <MapPin className="h-4 w-4 text-primary" />
+              <FileText className="h-4 w-4 text-primary" />
             </div>
             <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground mb-1">Street Address</label>
+              <label className="text-sm font-medium text-muted-foreground mb-1">Document Type</label>
               <div className="text-sm font-semibold">
-                {addressStreet ? (
+                {documentType ? (
                   <Badge variant="default" className="text-xs px-3 py-1">
-                    {addressStreet}
+                    {documentType === "ID_CARD" ? "ID Card" : "Passport"}
                   </Badge>
                 ) : (
                   <span className="text-muted-foreground italic">Not provided</span>
@@ -155,33 +147,33 @@ export default function AddressCard({ data, onSave, isEditing }: AddressCardProp
 
           <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-secondary/20 transition-colors">
             <div className="p-2 bg-secondary/10 rounded-full">
-              <MapPin className="h-4 w-4 text-secondary" />
+              <Eye className="h-4 w-4 text-secondary" />
             </div>
             <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground mb-1">City</label>
+              <label className="text-sm font-medium text-muted-foreground mb-1">Document Image</label>
               <div className="text-sm font-semibold">
-                {addressCity ? (
-                  <Badge variant="secondary" className="text-xs px-3 py-1">
-                    {addressCity}
-                  </Badge>
-                ) : (
-                  <span className="text-muted-foreground italic">Not provided</span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-accent/20 transition-colors">
-            <div className="p-2 bg-accent/10 rounded-full">
-              <MapPin className="h-4 w-4 text-accent" />
-            </div>
-            <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground mb-1">Country</label>
-              <div className="text-sm font-semibold">
-                {addressCountry ? (
-                  <Badge variant="outline" className="text-xs px-3 py-1">
-                    {addressCountry}
-                  </Badge>
+                {documentImage ? (
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={documentImage}
+                      alt="Document thumbnail"
+                      className="h-16 w-24 object-cover rounded-md border border-border"
+                    />
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="text-xs px-3 py-1">
+                        Document Available
+                      </Badge>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(documentImage, '_blank')}
+                        className="h-6 px-2 text-xs"
+                      >
+                        <Eye className="h-3 w-3 mr-1" />
+                        View
+                      </Button>
+                    </div>
+                  </div>
                 ) : (
                   <span className="text-muted-foreground italic">Not provided</span>
                 )}
