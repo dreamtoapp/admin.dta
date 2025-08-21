@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AddImage from "@/components/AddImage";
-import { User, Building2, Calendar, MapPin, Phone, Mail, Brain, Languages, GraduationCap, Briefcase, Edit2 } from "lucide-react";
+import { User, Building2, Calendar, MapPin, Phone, Mail, Brain, Languages, GraduationCap, Briefcase, Edit2, Eye } from "lucide-react";
 import { MockupProfileData, mockupProfileData, calculateProfileCompletion } from "./mockupData";
 import ProfileCompletionBar from "./ProfileCompletionBar";
 import PersonalInfoCard from "./PersonalInfoCard";
@@ -192,12 +192,26 @@ export default function StaffProfileClient() {
                 />
               </div>
             ) : (
-              <Avatar className="h-24 w-24 ring-4 ring-primary/10 shadow-lg">
-                <AvatarImage src={profileData.profileImage || undefined} alt={profileData.fullName || "Profile"} />
-                <AvatarFallback className="text-3xl bg-primary text-primary-foreground font-bold">
-                  {profileData.fullName?.split(' ').map(n => n[0]).join('').toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
+              <div className="flex items-center gap-2">
+                <Avatar className="h-24 w-24 ring-4 ring-primary/10 shadow-lg">
+                  <AvatarImage src={profileData.profileImage || undefined} alt={profileData.fullName || "Profile"} />
+                  <AvatarFallback className="text-3xl bg-primary text-primary-foreground font-bold">
+                    {profileData.fullName?.split(' ').map(n => n[0]).join('').toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
+                {profileData.profileImage && (
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => window.open(profileData.profileImage as string, '_blank')}
+                    className="h-8 w-8"
+                    aria-label="View profile image"
+                    title="View"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             )}
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
@@ -258,11 +272,6 @@ export default function StaffProfileClient() {
         </CardHeader>
       </Card>
 
-      {/* Profile Completion Bar */}
-      <div className="bg-card rounded-xl p-6 border border-border">
-        <ProfileCompletionBar data={profileData} />
-      </div>
-
       {/* Employment Information Card */}
       <Card className="border-2 border-destructive/20 shadow-sm bg-card">
         <CardHeader className="pb-3">
@@ -321,31 +330,27 @@ export default function StaffProfileClient() {
         </CardContent>
       </Card>
 
-      {/* Profile Cards Masonry Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {/* Personal Information */}
-        <div className="space-y-0">
+      {/* Profile Cards Professional Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Row 1: Personal (2 cols) + Official Documents (1 col) */}
+        <div className="col-span-1 lg:col-span-2 space-y-0">
           <PersonalInfoCard data={profileData} onSave={handleSaveProfile} isEditing={isEditing} />
         </div>
-
-        {/* Contact Information */}
-        <div className="space-y-0">
-          <ContactInfoCard data={profileData} onSave={handleSaveProfile} isEditing={isEditing} />
+        <div className="col-span-1 space-y-0">
+          <OfficialDocumentsCard data={profileData} onSave={handleSaveProfile} isEditing={isEditing} />
         </div>
 
-        {/* Address Information */}
-        <div className="space-y-0">
+        {/* Row 2: Contact (1 col) + Address (2 cols) */}
+        <div className="col-span-1 space-y-0">
+          <ContactInfoCard data={profileData} onSave={handleSaveProfile} isEditing={isEditing} />
+        </div>
+        <div className="col-span-1 lg:col-span-2 space-y-0">
           <AddressCard data={profileData} onSave={handleSaveProfile} isEditing={isEditing} />
         </div>
 
-        {/* Skills & Experience - Full width across all columns */}
-        <div className="col-span-1 md:col-span-2 xl:col-span-3 space-y-0">
+        {/* Row 3: Skills full width */}
+        <div className="col-span-1 lg:col-span-3 space-y-0">
           <SkillsCard data={profileData} onSave={handleSaveProfile} isEditing={isEditing} />
-        </div>
-
-        {/* Official Documents */}
-        <div className="space-y-0">
-          <OfficialDocumentsCard data={profileData} onSave={handleSaveProfile} isEditing={isEditing} />
         </div>
       </div>
     </div>

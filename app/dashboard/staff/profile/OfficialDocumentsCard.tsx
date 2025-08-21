@@ -159,20 +159,16 @@ export default function OfficialDocumentsCard({ data, onSave, isEditing }: Offic
                       alt="Document thumbnail"
                       className="h-16 w-24 object-cover rounded-md border border-border"
                     />
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="text-xs px-3 py-1">
-                        Document Available
-                      </Badge>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => window.open(documentImage, '_blank')}
-                        className="h-6 px-2 text-xs"
-                      >
-                        <Eye className="h-3 w-3 mr-1" />
-                        View
-                      </Button>
-                    </div>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => window.open(documentImage, '_blank')}
+                      className="h-8 w-8"
+                      aria-label="View document"
+                      title="View"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
                   </div>
                 ) : (
                   <span className="text-muted-foreground italic">Not provided</span>
