@@ -55,6 +55,8 @@ export interface MockupProfileData {
   addressStreet: string | null;
   addressCity: string | null;
   addressCountry: string | null;
+  latitude: number | null;
+  longitude: number | null;
 
   // Emergency Contact (flattened)
   emergencyContactName: string | null;
@@ -156,7 +158,9 @@ export const mockupProfileData: MockupProfileData = {
   // Address
   addressStreet: "King Fahd Road, Al Olaya District",
   addressCity: "Riyadh",
-  addressCountry: "Saudi Arabia",
+  addressCountry: "SA",
+  latitude: 24.7136,
+  longitude: 46.6753,
 
   // Emergency Contact
   emergencyContactName: "Sarah Al-Rashid",

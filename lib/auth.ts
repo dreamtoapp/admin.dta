@@ -96,6 +96,57 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return baseUrl;
     },
   },
+  events: {
+    async signIn({ user }) {
+      try {
+        // Close stale open sessions (>12h)
+        await prisma.attendance.updateMany({
+          where: {
+            userId: user.id!,
+            logoutAt: null,
+            loginAt: { lt: new Date(Date.now() - 12 * 60 * 60 * 1000) },
+          },
+          data: {
+            logoutAt: new Date(),
+            durationMin: 12 * 60,
+          },
+        });
+
+        // Start a new session
+        await prisma.attendance.create({
+          data: {
+            userId: user.id!,
+            loginAt: new Date(),
+            source: "AUTO_LOGIN_LOGOUT",
+          },
+        });
+      } catch (e) {
+        console.error("[attendance:signIn]", e);
+      }
+    },
+    async signOut({ token }) {
+      try {
+        if (!token?.sub) return;
+        const open = await prisma.attendance.findFirst({
+          where: { userId: token.sub, logoutAt: null },
+          orderBy: { loginAt: "desc" },
+        });
+        if (open) {
+          const now = new Date();
+          const minutes = Math.max(
+            1,
+            Math.ceil((now.getTime() - open.loginAt.getTime()) / 60000)
+          );
+          await prisma.attendance.update({
+            where: { id: open.id },
+            data: { logoutAt: now, durationMin: minutes },
+          });
+        }
+      } catch (e) {
+        console.error("[attendance:signOut]", e);
+      }
+    },
+  },
   pages: {
     signIn: '/auth/signin',
     error: '/auth/error',

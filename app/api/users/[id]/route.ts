@@ -116,6 +116,7 @@ export async function PUT(
     if (updateData.fullName !== undefined) updateFields.fullName = updateData.fullName;
     if (updateData.dateOfBirth !== undefined) updateFields.dateOfBirth = updateData.dateOfBirth ? new Date(updateData.dateOfBirth) : null;
     if (updateData.gender !== undefined) updateFields.gender = updateData.gender;
+    if ((updateData as any).maritalStatus !== undefined) updateFields.maritalStatus = (updateData as any).maritalStatus;
     if (updateData.nationality !== undefined) updateFields.nationality = updateData.nationality;
     if (updateData.profileImage !== undefined) updateFields.profileImage = updateData.profileImage;
 
@@ -140,6 +141,7 @@ export async function PUT(
     if (updateData.fieldOfStudy !== undefined) updateFields.fieldOfStudy = updateData.fieldOfStudy;
     if (updateData.generalSkills !== undefined) updateFields.generalSkills = updateData.generalSkills;
     if (updateData.generalExperience !== undefined) updateFields.generalExperience = updateData.generalExperience;
+    if ((updateData as any).englishProficiency !== undefined) updateFields.englishProficiency = (updateData as any).englishProficiency;
 
     // Official Documents (Staff editable)
     if (updateData.documentType !== undefined) updateFields.documentType = updateData.documentType;

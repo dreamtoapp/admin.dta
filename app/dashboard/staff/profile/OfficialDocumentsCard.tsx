@@ -20,7 +20,7 @@ interface OfficialDocumentsCardProps {
 }
 
 const officialDocumentsSchema = z.object({
-  documentType: z.enum(["ID_CARD", "PASSPORT"]).optional().or(z.literal("")),
+  documentType: z.string().optional().or(z.literal("")),
   documentImage: z.string().min(1, "Document image URL is required"),
 });
 
@@ -32,7 +32,7 @@ export default function OfficialDocumentsCard({ data, onSave, isEditing }: Offic
   const form = useForm<OfficialDocumentsFormValues>({
     resolver: zodResolver(officialDocumentsSchema),
     defaultValues: {
-      documentType: data.documentType || "",
+      documentType: (data.documentType as string) || "",
       documentImage: data.documentImage || "",
     },
   });
@@ -45,7 +45,7 @@ export default function OfficialDocumentsCard({ data, onSave, isEditing }: Offic
       if (!parsed.success) return;
       const v = parsed.data as OfficialDocumentsFormValues;
       const officialDocumentsData: Partial<MockupProfileData> = {
-        documentType: (v.documentType as "ID_CARD" | "PASSPORT") || null,
+        documentType: v.documentType || null,
         documentImage: v.documentImage,
       };
       onSave(officialDocumentsData);
@@ -116,7 +116,7 @@ export default function OfficialDocumentsCard({ data, onSave, isEditing }: Offic
   }
 
   return (
-    <Card className="h-fit shadow-sm hover:shadow-md transition-all duration-300 border border-border bg-card">
+    <Card className="h-full shadow-sm hover:shadow-md transition-all duration-300 border border-border bg-card">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-3 text-lg">
           <div className="p-2 bg-primary/10 rounded-lg">
@@ -125,63 +125,32 @@ export default function OfficialDocumentsCard({ data, onSave, isEditing }: Offic
           Official Documents
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 pb-4">
-        <div className="space-y-4">
-          <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-primary/20 transition-colors">
-            <div className="p-2 bg-primary/10 rounded-full">
-              <FileText className="h-4 w-4 text-primary" />
-            </div>
-            <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground mb-1">Document Type</label>
-              <div className="text-sm font-semibold">
-                {documentType ? (
-                  <Badge variant="default" className="text-xs px-3 py-1">
+      <CardContent className="flex-1 flex flex-col">
+        <div className="flex-1 flex items-center justify-center p-4">
+          {documentImage ? (
+            <div className="relative w-full h-full max-h-80 flex items-center justify-center">
+              <img
+                src={documentImage}
+                alt="Document"
+                className="max-w-full max-h-full object-contain rounded-lg border border-border shadow-sm"
+              />
+              {documentType && (
+                <div className="absolute top-3 left-3">
+                  <Badge variant="secondary" className="text-xs px-3 py-1.5 font-medium shadow-md">
                     {documentType === "ID_CARD" ? "ID Card" : "Passport"}
                   </Badge>
-                ) : (
-                  <span className="text-muted-foreground italic">Not provided</span>
-                )}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center text-center space-y-3 p-8">
+              <div className="p-4 bg-muted/30 rounded-full">
+                <FileText className="h-8 w-8 text-muted-foreground" />
               </div>
+              <span className="text-muted-foreground italic text-sm">No document uploaded</span>
             </div>
-          </div>
-
-          <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg border border-border hover:border-secondary/20 transition-colors">
-            <div className="p-2 bg-secondary/10 rounded-full">
-              <Eye className="h-4 w-4 text-secondary" />
-            </div>
-            <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground mb-1">Document Image</label>
-              <div className="text-sm font-semibold">
-                {documentImage ? (
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={documentImage}
-                      alt="Document thumbnail"
-                      className="h-16 w-24 object-cover rounded-md border border-border"
-                    />
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => window.open(documentImage, '_blank')}
-                      className="h-8 w-8"
-                      aria-label="View document"
-                      title="View"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <span className="text-muted-foreground italic">Not provided</span>
-                )}
-              </div>
-            </div>
-          </div>
+          )}
         </div>
-
-        {onSave && (
-          <div className="pt-3 border-t border-border">
-          </div>
-        )}
       </CardContent>
     </Card>
   );

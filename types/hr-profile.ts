@@ -138,6 +138,7 @@ export interface UserProfile {
   gender?: Gender;
   nationality?: string;
   profileImage?: string;
+  maritalStatus?: string;
 
   // Contact Information
   mobilePrimary?: string;
@@ -193,6 +194,7 @@ export interface UpdateUserProfileRequest {
   fieldOfStudy?: string;
   generalSkills?: string;
   generalExperience?: string;
+  englishProficiency?: string;
 
   // Official Documents
   documentType?: string;

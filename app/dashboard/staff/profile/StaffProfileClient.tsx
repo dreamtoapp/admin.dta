@@ -6,13 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import AddImage from "@/components/AddImage";
 import { User, Building2, Calendar, MapPin, Phone, Mail, Brain, Languages, GraduationCap, Briefcase, Edit2, Eye } from "lucide-react";
 import { MockupProfileData, mockupProfileData, calculateProfileCompletion } from "./mockupData";
 import ProfileCompletionBar from "./ProfileCompletionBar";
 import PersonalInfoCard from "./PersonalInfoCard";
 import ContactInfoCard from "./ContactInfoCard";
-import AddressCard from "./AddressCard";
 import SkillsCard from "./SkillsCard";
 import OfficialDocumentsCard from "./OfficialDocumentsCard";
 
@@ -23,6 +23,7 @@ export default function StaffProfileClient() {
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [originalData, setOriginalData] = useState<MockupProfileData | null>(null);
+  const [isEmploymentOpen, setIsEmploymentOpen] = useState(false);
 
   // Normalize date-like fields from API payloads into Date objects for UI safety
   const normalizeProfile = (raw: any): MockupProfileData => {
@@ -74,10 +75,13 @@ export default function StaffProfileClient() {
         const response = await fetch(`/api/users/${session.user.id}`);
         if (!response.ok) throw new Error("Failed to fetch user profile");
         const data = await response.json();
+        console.log("API response data:", data);
+        console.log("Normalized profile data:", normalizeProfile(data));
         setProfileData(normalizeProfile(data));
       } catch (error) {
         console.error("Failed to fetch profile data:", error);
         // Keep mock data if API fails
+        console.log("Using mockup data:", mockupProfileData);
         setProfileData(mockupProfileData);
       } finally {
         setLoading(false);
@@ -92,15 +96,15 @@ export default function StaffProfileClient() {
       // Filter to server-supported fields
       const allowedKeys: Array<keyof Partial<MockupProfileData>> = [
         // Personal
-        "fullName", "dateOfBirth", "gender", "nationality", "profileImage",
+        "fullName", "dateOfBirth", "gender", "maritalStatus", "nationality", "profileImage",
         // Contact
         "mobilePrimary", "homePhone", "workExtension", "alternativeEmail",
         // Address
-        "addressStreet", "addressCity", "addressCountry",
+        "addressStreet", "addressCity", "addressCountry", "latitude", "longitude",
         // Emergency
         "emergencyContactName", "emergencyContactPhone", "emergencyContactRelationship",
         // Education & Skills
-        "educationLevel", "fieldOfStudy", "generalSkills", "generalExperience",
+        "educationLevel", "fieldOfStudy", "generalSkills", "generalExperience", "englishProficiency",
         // Official Docs
         "documentType", "documentImage",
         // Admin fields (will be ignored server-side if not admin)
@@ -177,40 +181,50 @@ export default function StaffProfileClient() {
         <CardHeader className="pb-6">
           <div className="flex items-center gap-6">
             {isEditing ? (
-              <div className="h-24 w-24 ring-4 ring-primary/10 shadow-lg rounded-full overflow-hidden">
-                <AddImage
-                  url={profileData.profileImage || undefined}
-                  alt={profileData.fullName || "Profile"}
-                  recordId={profileData.id}
-                  table="user"
-                  tableField="profileImage"
-                  className="h-24 w-24"
-                  onUploadComplete={(url) => {
-                    setProfileData(prev => ({ ...prev, profileImage: url }));
-                  }}
-                  folder={"profiles"}
-                />
+              <div className="flex flex-col items-start">
+                <div className="h-24 w-24 ring-4 ring-primary/10 shadow-lg rounded-full overflow-hidden">
+                  <AddImage
+                    url={profileData.profileImage || undefined}
+                    alt={profileData.fullName || "Profile"}
+                    recordId={profileData.id}
+                    table="user"
+                    tableField="profileImage"
+                    className="h-24 w-24"
+                    onUploadComplete={(url) => {
+                      setProfileData(prev => ({ ...prev, profileImage: url }));
+                    }}
+                    folder={"profiles"}
+                  />
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground max-w-[16rem]">
+                  Please choose a clear, professional photo. This image appears on the Team page.
+                </p>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <Avatar className="h-24 w-24 ring-4 ring-primary/10 shadow-lg">
-                  <AvatarImage src={profileData.profileImage || undefined} alt={profileData.fullName || "Profile"} />
-                  <AvatarFallback className="text-3xl bg-primary text-primary-foreground font-bold">
-                    {profileData.fullName?.split(' ').map(n => n[0]).join('').toUpperCase() || "U"}
-                  </AvatarFallback>
-                </Avatar>
-                {profileData.profileImage && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => window.open(profileData.profileImage as string, '_blank')}
-                    className="h-8 w-8"
-                    aria-label="View profile image"
-                    title="View"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                )}
+              <div className="flex flex-col items-start">
+                <div className="flex items-center gap-2">
+                  <Avatar className="h-24 w-24 ring-4 ring-primary/10 shadow-lg">
+                    <AvatarImage src={profileData.profileImage || undefined} alt={profileData.fullName || "Profile"} />
+                    <AvatarFallback className="text-3xl bg-primary text-primary-foreground font-bold">
+                      {profileData.fullName?.split(' ').map(n => n[0]).join('').toUpperCase() || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                  {profileData.profileImage && (
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => window.open(profileData.profileImage as string, '_blank')}
+                      className="h-8 w-8"
+                      aria-label="View profile image"
+                      title="View"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground max-w-[16rem]">
+                  Please choose a clear, professional photo. This image appears on the Team page.
+                </p>
               </div>
             )}
             <div className="flex-1">
@@ -274,78 +288,97 @@ export default function StaffProfileClient() {
 
       {/* Employment Information Card */}
       <Card className="border-2 border-destructive/20 shadow-sm bg-card">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-3 text-xl">
-            <div className="p-2 bg-destructive/20 rounded-lg">
-              <Building2 className="h-6 w-6 text-destructive" />
-            </div>
-            Employment Information
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pb-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="space-y-3">
-              <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                <label className="text-sm font-medium text-muted-foreground mb-1 block">Job Title</label>
-                <div className="text-sm font-semibold">{profileData.jobTitle || "Not specified"}</div>
+        <Collapsible open={isEmploymentOpen} onOpenChange={setIsEmploymentOpen}>
+          <CardHeader className="pb-3">
+            <CollapsibleTrigger asChild>
+              <CardTitle className="flex items-center gap-3 text-xl cursor-pointer hover:opacity-80 transition-opacity">
+                <div className="p-2 bg-destructive/20 rounded-lg">
+                  <Building2 className="h-6 w-6 text-destructive" />
+                </div>
+                Employment Information
+                <div className="ml-auto">
+                  <div className={`w-5 h-5 transition-transform duration-200 ${isEmploymentOpen ? 'rotate-180' : ''}`}>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="w-5 h-5"
+                    >
+                      <polyline points="6,9 12,15 18,9" />
+                    </svg>
+                  </div>
+                </div>
+              </CardTitle>
+            </CollapsibleTrigger>
+          </CardHeader>
+          <CollapsibleContent>
+            <CardContent className="pb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="space-y-3">
+                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Job Title</label>
+                    <div className="text-sm font-semibold">{profileData.jobTitle || "Not specified"}</div>
+                  </div>
+                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Job Level</label>
+                    <div className="text-sm font-semibold">{profileData.jobLevel || "Not specified"}</div>
+                  </div>
+                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Contract Type</label>
+                    <div className="text-sm font-semibold">{profileData.contractType || "Not specified"}</div>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Basic Salary</label>
+                    <div className="text-sm font-semibold">{profileData.basicSalary || "Not specified"}</div>
+                  </div>
+                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Bonus</label>
+                    <div className="text-sm font-semibold">{profileData.bonus || "Not specified"}</div>
+                  </div>
+                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Work Schedule</label>
+                    <div className="text-sm font-semibold">{profileData.workSchedule || "Not specified"}</div>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Work Location</label>
+                    <div className="text-sm font-semibold">{profileData.workLocation || "Not specified"}</div>
+                  </div>
+                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Notice Period</label>
+                    <div className="text-sm font-semibold">{profileData.noticePeriod ? `${profileData.noticePeriod} days` : "Not specified"}</div>
+                  </div>
+                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Employment Status</label>
+                    <div className="text-sm font-semibold">{profileData.employmentStatus || "Not specified"}</div>
+                  </div>
+                </div>
               </div>
-              <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                <label className="text-sm font-medium text-muted-foreground mb-1 block">Job Level</label>
-                <div className="text-sm font-semibold">{profileData.jobLevel || "Not specified"}</div>
-              </div>
-              <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                <label className="text-sm font-medium text-muted-foreground mb-1 block">Contract Type</label>
-                <div className="text-sm font-semibold">{profileData.contractType || "Not specified"}</div>
-              </div>
-            </div>
-            <div className="space-y-3">
-              <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                <label className="text-sm font-medium text-muted-foreground mb-1 block">Basic Salary</label>
-                <div className="text-sm font-semibold">{profileData.basicSalary || "Not specified"}</div>
-              </div>
-              <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                <label className="text-sm font-medium text-muted-foreground mb-1 block">Bonus</label>
-                <div className="text-sm font-semibold">{profileData.bonus || "Not specified"}</div>
-              </div>
-              <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                <label className="text-sm font-medium text-muted-foreground mb-1 block">Work Schedule</label>
-                <div className="text-sm font-semibold">{profileData.workSchedule || "Not specified"}</div>
-              </div>
-            </div>
-            <div className="space-y-3">
-              <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                <label className="text-sm font-medium text-muted-foreground mb-1 block">Work Location</label>
-                <div className="text-sm font-semibold">{profileData.workLocation || "Not specified"}</div>
-              </div>
-              <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                <label className="text-sm font-medium text-muted-foreground mb-1 block">Notice Period</label>
-                <div className="text-sm font-semibold">{profileData.noticePeriod ? `${profileData.noticePeriod} days` : "Not specified"}</div>
-              </div>
-              <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                <label className="text-sm font-medium text-muted-foreground mb-1 block">Employment Status</label>
-                <div className="text-sm font-semibold">{profileData.employmentStatus || "Not specified"}</div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
+            </CardContent>
+          </CollapsibleContent>
+        </Collapsible>
       </Card>
 
       {/* Profile Cards Professional Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Row 1: Personal (2 cols) + Official Documents (1 col) */}
-        <div className="col-span-1 lg:col-span-2 space-y-0">
+        <div className="col-span-1 lg:col-span-2 space-y-0 h-full">
           <PersonalInfoCard data={profileData} onSave={handleSaveProfile} isEditing={isEditing} />
         </div>
-        <div className="col-span-1 space-y-0">
+        <div className="col-span-1 space-y-0 h-full">
           <OfficialDocumentsCard data={profileData} onSave={handleSaveProfile} isEditing={isEditing} />
         </div>
 
-        {/* Row 2: Contact (1 col) + Address (2 cols) */}
-        <div className="col-span-1 space-y-0">
+        {/* Row 2: Contact & Address (full width) */}
+        <div className="col-span-1 lg:col-span-3 space-y-0">
           <ContactInfoCard data={profileData} onSave={handleSaveProfile} isEditing={isEditing} />
-        </div>
-        <div className="col-span-1 lg:col-span-2 space-y-0">
-          <AddressCard data={profileData} onSave={handleSaveProfile} isEditing={isEditing} />
         </div>
 
         {/* Row 3: Skills full width */}

@@ -64,6 +64,7 @@ model User {
   fullName          String?
   dateOfBirth       DateTime?
   gender            Gender?
+  maritalStatus     String?
   nationality       String?
   profileImage      String?
 
@@ -95,6 +96,7 @@ model User {
   fieldOfStudy     String?
   generalSkills    String? // General skills as text
   generalExperience String? // General experience as text
+  englishProficiency String?
 
   // Address (flattened)
   addressStreet    String?
@@ -129,6 +131,9 @@ model User {
   // Direct Manager Relations
   directManager    User?   @relation("DirectManager", fields: [directManagerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   subordinates     User[]  @relation("DirectManager")
+
+  // Attendance Relations
+  attendanceSessions Attendance[]
 }
 
 // Enhanced Task Management Models
@@ -460,6 +465,24 @@ model WorkLog {
   user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   task            Task?       @relation(fields: [taskId], references: [id], onDelete: SetNull)
   reviewer        User?       @relation("WorkLogReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
+}
+
+// Attendance tracking for login/logout
+model Attendance {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @db.ObjectId
+  loginAt      DateTime
+  logoutAt     DateTime?
+  durationMin  Int?
+  source       String
+  ip           String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, loginAt])
 }
 
 // Add WorkLogStatus enum
