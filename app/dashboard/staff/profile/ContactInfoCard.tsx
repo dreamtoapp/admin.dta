@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Phone, Mail, Building2, Edit2, Save, X, User, MapPin, Globe, Search, ChevronDown } from "lucide-react";
+import { MapPin, Globe } from "lucide-react";
 import { ProfileData, ProfileDataUpdate } from "./types";
 import { fetchCountries, fetchCitiesByCountry, Country, City } from "@/lib/utils/location-helpers";
 import LocationDetector from "./LocationDetector";
@@ -27,10 +27,6 @@ const contactSchema = z.object({
   addressCountry: z.string().min(1, "البلد مطلوب"),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
-  // Emergency contact fields
-  emergencyContactName: z.string().min(1, "اسم جهة الاتصال في الطوارئ مطلوب"),
-  emergencyContactPhone: z.string().min(1, "رقم هاتف جهة الاتصال في الطوارئ مطلوب"),
-  emergencyContactRelationship: z.string().min(1, "علاقة جهة الاتصال في الطوارئ مطلوبة"),
 });
 
 type ContactFormValues = z.infer<typeof contactSchema>;
@@ -59,16 +55,18 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
   // If there's an error, show a fallback UI
   if (errorState.hasError) {
     return (
-      <Card className="h-full">
+      <Card className="h-full border border-border bg-card">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-red-600">
-            <Phone className="h-5 w-5" />
-            خطأ في تحميل معلومات الاتصال
+          <CardTitle className="flex items-center space-x-3 space-x-reverse text-base">
+            <MapPin className="h-5 w-5 text-red-600" />
+            <div>
+              <div className="font-semibold text-red-600">خطأ في تحميل معلومات الاتصال</div>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="p-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <p className="text-sm text-red-600 dark:text-red-400 mb-4">
+          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-600 mb-4">
               حدث خطأ أثناء تحميل معلومات الاتصال.
             </p>
             <Button
@@ -95,9 +93,6 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
       addressCountry: data.addressCountry || "",
       latitude: data.latitude || undefined,
       longitude: data.longitude || undefined,
-      emergencyContactName: data.emergencyContactName || "",
-      emergencyContactPhone: data.emergencyContactPhone || "",
-      emergencyContactRelationship: data.emergencyContactRelationship || "",
     },
   });
 
@@ -115,9 +110,6 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
       const contactData: ProfileDataUpdate = {
         addressCity: v.addressCity,
         addressCountry: v.addressCountry,
-        emergencyContactName: v.emergencyContactName,
-        emergencyContactPhone: v.emergencyContactPhone,
-        emergencyContactRelationship: v.emergencyContactRelationship,
       };
 
       // Only include coordinates if user is admin or coordinates don't exist
@@ -295,143 +287,72 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
   const { mobile, contactEmail, addressCity, addressCountry } = data;
 
   return (
-    <Card className="h-full shadow-sm hover:shadow-md transition-all duration-300 border border-border bg-card">
-      <CardContent className="space-y-6 pb-4 flex-1">
+    <Card className="h-full border border-border bg-card">
+
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center space-x-3 space-x-reverse text-base">
+          <MapPin className="h-5 w-5 text-primary" />
+          <div>
+            <div className="font-semibold text-foreground">معلومات الاتصال والعنوان</div>
+            <div className="text-sm text-muted-foreground font-normal">بيانات العنوان والموقع الجغرافي</div>
+          </div>
+        </CardTitle>
+      </CardHeader>
+
+      <CardContent className="space-y-6">
         <Form {...form}>
           <form className="space-y-6">
-            {/* Contact Information Section */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 pb-2 border-b border-border">
-                <Phone className="h-4 w-4 text-primary" />
-                <h4 className="text-sm font-semibold text-foreground">معلومات الاتصال</h4>
-              </div>
-            </div>
 
-            {/* Location Coordinates Section */}
+            {/* Location Detection Section */}
             <div className="space-y-4">
-              <LocationDetector
-                control={form.control}
-                onLocationUpdate={handleLocationUpdate}
-                onError={handleLocationError}
-              />
+              <h4 className="text-sm font-medium text-foreground">تحديد الموقع</h4>
+              
+              <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                <LocationDetector
+                  control={form.control}
+                  onLocationUpdate={handleLocationUpdate}
+                  onError={handleLocationError}
+                />
+              </div>
             </div>
 
             {/* Address Information Section */}
             <div className="space-y-4">
-              <div className="flex items-center gap-2 pb-2 border-b border-border">
-                <MapPin className="h-4 w-4 text-primary" />
-                <h4 className="text-sm font-semibold text-foreground">معلومات العنوان</h4>
-              </div>
-
+              <h4 className="text-sm font-medium text-foreground">معلومات العنوان</h4>
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center gap-3 p-3 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg border border-green-200 dark:border-green-800 hover:border-green-300 dark:hover:border-green-700 transition-all duration-200">
-                  <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-full">
-                    <Building2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="text-xs font-medium text-green-600 dark:text-green-400 uppercase tracking-wide mb-1">المدينة</label>
-                    <div className="text-sm font-semibold text-foreground">
-                      {addressCity ? (
-                        <span className="block truncate">{addressCity}</span>
-                      ) : (
-                        <span className="text-muted-foreground italic text-xs">غير محدد</span>
-                      )}
-                    </div>
+                {/* City Display */}
+                <div className="p-3 bg-muted/50 rounded-lg border border-border">
+                  <label className="text-sm font-medium text-muted-foreground block mb-1">المدينة</label>
+                  <div className="font-medium text-foreground">
+                    {addressCity || (
+                      <span className="text-muted-foreground text-sm">غير محدد</span>
+                    )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-950/20 dark:to-violet-950/20 rounded-lg border border-purple-200 dark:border-purple-800 hover:border-purple-300 dark:hover:border-purple-700 transition-all duration-200">
-                  <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-full">
-                    <Globe className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wide mb-1">البلد</label>
-                    <div className="text-sm font-semibold text-foreground">
-                      {addressCountry ? (
-                        <div className="flex items-center gap-2">
-                          {countries.find(c => c.code === addressCountry)?.flag && (
-                            <span className="text-lg">{countries.find(c => c.code === addressCountry)?.flag}</span>
-                          )}
-                          <span className="block truncate">
-                            {countries.find(c => c.code === addressCountry)?.name || addressCountry}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground italic text-xs">غير محدد</span>
-                      )}
-                    </div>
+                {/* Country Display */}
+                <div className="p-3 bg-muted/50 rounded-lg border border-border">
+                  <label className="text-sm font-medium text-muted-foreground block mb-1">البلد</label>
+                  <div className="font-medium text-foreground">
+                    {addressCountry ? (
+                      <div className="flex items-center gap-2">
+                        {countries.find(c => c.code === addressCountry)?.flag && (
+                          <span className="text-lg">{countries.find(c => c.code === addressCountry)?.flag}</span>
+                        )}
+                        <span>
+                          {countries.find(c => c.code === addressCountry)?.name || addressCountry}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">غير محدد</span>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Emergency Contact Section */}
-            <div className="space-y-4 pt-4 border-t border-border">
-              <div className="flex items-center gap-2 pb-2">
-                <User className="h-4 w-4 text-red-500" />
-                <h4 className="text-sm font-semibold text-foreground">جهة الاتصال في الطوارئ</h4>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <FormField
-                  control={form.control}
-                  name="emergencyContactName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs font-medium text-red-600 dark:text-red-400 uppercase tracking-wide">اسم جهة الاتصال *</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="اسم جهة الاتصال في الطوارئ"
-                          {...field}
-                          className="border-red-200 focus:border-red-400"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="emergencyContactPhone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs font-medium text-orange-600 dark:text-orange-400 uppercase tracking-wide">رقم الهاتف *</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="رقم هاتف جهة الاتصال في الطوارئ"
-                          {...field}
-                          className="border-orange-200 focus:border-orange-400"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="emergencyContactRelationship"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs font-medium text-teal-600 dark:text-teal-400 uppercase tracking-wide">العلاقة *</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="مثل: زوج، والد، شقيق"
-                          {...field}
-                          className="border-teal-200 focus:border-teal-400"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-
-
-            {/* Global Save/Cancel handled in header */}
           </form>
         </Form>
       </CardContent>

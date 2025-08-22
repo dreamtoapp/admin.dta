@@ -27,27 +27,38 @@ export default function WorkExperienceCard({ data, onChange }: WorkExperienceCar
     }
   }, [data.workExperienceSummary]);
 
-  // Always render in edit mode
   return (
-    <Card className="h-fit shadow-sm hover:shadow-md transition-all duration-300 border border-border bg-card">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-3 text-lg">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <Briefcase className="h-5 w-5 text-primary" />
+    <Card className="h-fit border border-border bg-card">
+
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center space-x-3 space-x-reverse text-base">
+          <Briefcase className="h-5 w-5 text-primary" />
+          <div>
+            <div className="font-semibold text-foreground">الخبرة العملية</div>
+            <div className="text-sm text-muted-foreground font-normal">السجل المهني والخبرات العملية السابقة</div>
           </div>
-          الخبرة العملية
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 pb-4">
-        {/* Simple textarea for work experience summary */}
-        <div className="space-y-3">
+
+      <CardContent className="space-y-6">
+        <div className="space-y-4">
           <label className="text-sm font-medium text-foreground">ملخص الخبرة العملية</label>
+          
           <Textarea
-            placeholder="أدخل خبرتك العملية..."
+            placeholder="أدخل خبرتك العملية والمناصب السابقة...
+
+مثال:
+• مدير تسويق رقمي - شركة التقنية (2020-2023)
+• مصمم جرافيك - وكالة الإبداع (2018-2020)
+• متدرب تسويق - شركة النمو (2017-2018)"
             value={workExperienceSummary}
             onChange={(e) => handleChange(e.target.value)}
-            className="min-h-[120px]"
+            className="min-h-[120px] resize-none"
           />
+          
+          <div className="text-xs text-muted-foreground text-left">
+            {workExperienceSummary.length} حرف
+          </div>
         </div>
       </CardContent>
     </Card>

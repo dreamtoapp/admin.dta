@@ -8,12 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import AddImage from "@/components/AddImage";
-import { User, Building2, Calendar, Phone, Mail } from "lucide-react";
+import { User, Building2, Calendar, Phone, Mail, Users, FileText, UserCheck, DollarSign, Gift } from "lucide-react";
 import { ProfileData } from "./types";
 import PersonalInfoCard from "./PersonalInfoCard";
 import ContactInfoCard from "./ContactInfoCard";
-import EducationCard from "./EducationCard";
-import WorkExperienceCard from "./WorkExperienceCard";
+
 import OfficialDocumentsCard from "./OfficialDocumentsCard";
 import { UserRole } from "@/constant/enums";
 import Swal from 'sweetalert2';
@@ -21,14 +20,13 @@ import Swal from 'sweetalert2';
 export default function StaffProfileClient() {
   const { data: session, status } = useSession();
   const [profileData, setProfileData] = useState<ProfileData>({
-    // Initialize with empty structure based on Prisma User schema
-    id: session?.user?.id || "",
+    // Basic User fields
+    id: "",
     name: null,
     email: "",
     emailVerified: null,
     image: null,
-    role: UserRole.STAFF,
-    department: null,
+    role: "STAFF" as UserRole,
     isActive: true,
     lastLogin: null,
     createdAt: new Date(),
@@ -49,10 +47,7 @@ export default function StaffProfileClient() {
     // Employment Information (read-only, from backend)
     hireDate: null,
     contractType: null,
-    employmentStatus: null,
-    noticePeriod: null,
     workSchedule: null,
-    workLocation: null,
     directManagerId: null,
     jobTitle: null,
     jobLevel: null,
@@ -163,13 +158,13 @@ export default function StaffProfileClient() {
         if (status !== "authenticated" || !session?.user?.id) {
           // Fallback to empty structure while unauthenticated state resolves
           setProfileData({
+            ...profileData,
             id: session?.user?.id || "",
-            name: null,
-            email: "",
+            name: session?.user?.name || null,
+            email: session?.user?.email || "",
             emailVerified: null,
             image: null,
             role: UserRole.STAFF,
-            department: null,
             isActive: true,
             lastLogin: null,
             createdAt: new Date(),
@@ -184,10 +179,7 @@ export default function StaffProfileClient() {
             contactEmail: null,
             hireDate: null,
             contractType: null,
-            employmentStatus: null,
-            noticePeriod: null,
             workSchedule: null,
-            workLocation: null,
             directManagerId: null,
             jobTitle: null,
             jobLevel: null,
@@ -222,13 +214,13 @@ export default function StaffProfileClient() {
         // Keep empty structure if API fails
         console.log("Using empty profile structure");
         setProfileData({
+          ...profileData,
           id: session?.user?.id || "",
-          name: null,
-          email: "",
+          name: session?.user?.name || null,
+          email: session?.user?.email || "",
           emailVerified: null,
           image: null,
           role: UserRole.STAFF,
-          department: null,
           isActive: true,
           lastLogin: null,
           createdAt: new Date(),
@@ -243,10 +235,7 @@ export default function StaffProfileClient() {
           contactEmail: null,
           hireDate: null,
           contractType: null,
-          employmentStatus: null,
-          noticePeriod: null,
           workSchedule: null,
-          workLocation: null,
           directManagerId: null,
           jobTitle: null,
           jobLevel: null,
@@ -281,8 +270,6 @@ export default function StaffProfileClient() {
       const allowedKeys: Array<keyof Partial<ProfileData>> = [
         // Personal
         "fullName", "dateOfBirth", "gender", "maritalStatus", "nationality", "profileImage",
-        // Contact
-        "mobile", "contactEmail",
         // Address
         "addressCity", "addressCountry", "latitude", "longitude",
         // Emergency
@@ -292,7 +279,7 @@ export default function StaffProfileClient() {
         // Official Docs
         "documentType", "documentImage",
         // Admin fields (will be ignored server-side if not admin)
-        "hireDate", "contractType", "employmentStatus", "noticePeriod", "workSchedule", "workLocation", "directManagerId", "jobTitle", "jobLevel", "basicSalary", "bonus",
+        "hireDate", "contractType", "workSchedule", "directManagerId", "jobTitle", "jobLevel", "basicSalary", "bonus",
         // Basic
         "name", "email"
       ];
@@ -364,10 +351,6 @@ export default function StaffProfileClient() {
       if (profileData.maritalStatus !== undefined) fieldsToUpdate.maritalStatus = profileData.maritalStatus;
       if (profileData.nationality !== undefined) fieldsToUpdate.nationality = profileData.nationality;
       if (profileData.profileImage !== undefined) fieldsToUpdate.profileImage = profileData.profileImage;
-
-      // Contact Information
-      if (profileData.mobile !== undefined) fieldsToUpdate.mobile = profileData.mobile;
-      if (profileData.contactEmail !== undefined) fieldsToUpdate.contactEmail = profileData.contactEmail;
 
       // Address Information
       if (profileData.addressCity !== undefined) fieldsToUpdate.addressCity = profileData.addressCity;
@@ -488,197 +471,311 @@ export default function StaffProfileClient() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">جاري تحميل الملف الشخصي...</p>
+      <div className="min-h-screen bg-background" dir="rtl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+          {/* Simple Business Loading State */}
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center space-y-6">
+
+              {/* Simple Spinner */}
+              <div className="w-8 h-8 border-2 border-muted border-t-primary rounded-full animate-spin mx-auto"></div>
+
+              {/* Simple Loading Text */}
+              <div>
+                <h2 className="text-lg font-medium text-foreground">جاري تحميل البيانات</h2>
+                <p className="text-sm text-muted-foreground">يرجى الانتظار...</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" dir="rtl">
-      {/* Error and Success Messages */}
-      {error && (
-        <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg">
-          <p className="font-medium">خطأ: {error}</p>
-        </div>
-      )}
+    <div className="min-h-screen bg-background" dir="rtl">
+      {/* Clean Business Page Container */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-      {success && (
-        <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
-          <p className="font-medium">{success}</p>
+        {/* Simple Business Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold text-foreground mb-2">
+            الملف الشخصي
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            إدارة البيانات الشخصية للموظف
+          </p>
         </div>
-      )}
 
-      {/* Profile Header */}
-      <Card className="shadow-sm border border-border bg-card">
-        <CardHeader className="pb-6">
-          <div className="flex items-center gap-6">
-            {/* Removed isEditing logic as per Task 1.3 */}
-            <div className="flex flex-col items-start">
-              <div className="h-24 w-24 ring-4 ring-primary/10 shadow-lg rounded-full overflow-hidden">
-                <AddImage
-                  url={profileData.profileImage || undefined}
-                  alt={profileData.fullName || "الملف الشخصي"}
-                  recordId={profileData.id}
-                  table="user"
-                  tableField="profileImage"
-                  className="h-24 w-24"
-                  onUploadComplete={(url) => {
-                    setProfileData(prev => ({ ...prev, profileImage: url }));
-                  }}
-                  folder={"profiles"}
-                />
-              </div>
-              <p className="mt-2 text-xs text-muted-foreground max-w-[16rem]">
-                يرجى اختيار صورة واضحة ومهنية. تظهر هذه الصورة في صفحة الفريق.
-              </p>
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-3">
-                <h1 className="text-3xl font-bold tracking-tight">{profileData.fullName || "عضو الفريق"}</h1>
-                <Badge variant="outline" className="text-sm px-3 py-1">{profileData.role === 'STAFF' ? 'موظف' : profileData.role === 'ADMIN' ? 'مدير' : 'عميل'}</Badge>
-              </div>
-              <div className="flex items-center gap-6 text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4" />
-                  <span className="text-sm">{profileData.department || "لا يوجد قسم"}</span>
+        {/* Clean Error and Success Messages */}
+        <div className="space-y-3 mb-6">
+          {error && (
+            <div className="p-4 border border-red-200 bg-red-50 rounded-lg">
+              <div className="flex items-center space-x-3 space-x-reverse">
+                <div className="w-5 h-5 text-red-600">
+                  <svg fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  <span className="text-sm">تاريخ التعيين: {profileData.hireDate ? profileData.hireDate.toLocaleDateString() : "غير محدد"}</span>
+                <div>
+                  <h4 className="text-sm font-medium text-red-800">خطأ</h4>
+                  <p className="text-sm text-red-700">{error}</p>
                 </div>
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-sm text-muted-foreground mb-1">اكتمال الملف الشخصي</div>
-              <div className="text-3xl font-bold text-primary mb-3">{calculateProfileCompletion(profileData)}%</div>
-              {/* Global Save Button as per Task 3.1 */}
-              <Button
-                onClick={handleGlobalSave}
-                disabled={saving}
-                className="shadow-md hover:shadow-lg transition-shadow px-8 py-3"
-                size="lg"
-              >
-                {saving ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    جاري الحفظ...
-                  </>
-                ) : (
-                  <>
-                    <User className="h-4 w-4 mr-2" />
-                    حفظ جميع التغييرات
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
+          )}
 
-      {/* Employment Information Card */}
-      <Card className="border-2 border-destructive/20 shadow-sm bg-card">
-        <Collapsible open={isEmploymentOpen} onOpenChange={setIsEmploymentOpen}>
-          <CardHeader className="pb-3">
-            <CollapsibleTrigger asChild>
-              <CardTitle className="flex items-center gap-3 text-xl cursor-pointer hover:opacity-80 transition-opacity">
-                <div className="p-2 bg-destructive/20 rounded-lg">
-                  <Building2 className="h-6 w-6 text-destructive" />
+          {success && (
+            <div className="p-4 border border-green-200 bg-green-50 rounded-lg">
+              <div className="flex items-center space-x-3 space-x-reverse">
+                <div className="w-5 h-5 text-green-600">
+                  <svg fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
                 </div>
-                معلومات التوظيف
-                <div className="ml-auto">
-                  <div className={`w-5 h-5 transition-transform duration-200 ${isEmploymentOpen ? 'rotate-180' : ''}`}>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="w-5 h-5"
-                    >
-                      <polyline points="6,9 12,15 18,9" />
-                    </svg>
-                  </div>
-                </div>
-              </CardTitle>
-            </CollapsibleTrigger>
-          </CardHeader>
-          <CollapsibleContent>
-            <CardContent className="pb-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="space-y-3">
-                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">المسمى الوظيفي</label>
-                    <div className="text-sm font-semibold">{profileData.jobTitle || "غير محدد"}</div>
-                  </div>
-                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">المستوى الوظيفي</label>
-                    <div className="text-sm font-semibold">{profileData.jobLevel || "غير محدد"}</div>
-                  </div>
-                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">نوع العقد</label>
-                    <div className="text-sm font-semibold">{profileData.contractType || "غير محدد"}</div>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">الراتب الأساسي</label>
-                    <div className="text-sm font-semibold">{profileData.basicSalary || "غير محدد"}</div>
-                  </div>
-                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">المكافأة</label>
-                    <div className="text-sm font-semibold">{profileData.bonus || "غير محدد"}</div>
-                  </div>
-                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">جدول العمل</label>
-                    <div className="text-sm font-semibold">{profileData.workSchedule || "غير محدد"}</div>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">موقع العمل</label>
-                    <div className="text-sm font-semibold">{profileData.workLocation || "غير محدد"}</div>
-                  </div>
-                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">فترة الإشعار</label>
-                    <div className="text-sm font-semibold">{profileData.noticePeriod ? `${profileData.noticePeriod} يوم` : "غير محدد"}</div>
-                  </div>
-                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">حالة التوظيف</label>
-                    <div className="text-sm font-semibold">{profileData.employmentStatus || "غير محدد"}</div>
-                  </div>
+                <div>
+                  <h4 className="text-sm font-medium text-green-800">نجح</h4>
+                  <p className="text-sm text-green-700">{success}</p>
                 </div>
               </div>
-            </CardContent>
-          </CollapsibleContent>
-        </Collapsible>
-      </Card>
-
-      {/* Profile Cards Professional Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Row 1: Personal Information (2 cols) + Official Documents (1 col) */}
-        <div className="col-span-1 lg:col-span-2 space-y-0 h-full">
-          <PersonalInfoCard data={profileData} onChange={handleProfileChange} />
-        </div>
-        <div className="col-span-1 space-y-0 h-full">
-          <OfficialDocumentsCard data={profileData} onChange={handleProfileChange} />
+            </div>
+          )}
         </div>
 
-        {/* Row 2: Contact & Address (full width) */}
-        <div className="col-span-1 lg:col-span-3 space-y-0">
-          <ContactInfoCard data={profileData} onChange={handleProfileChange} />
-        </div>
+        {/* Main Content Container */}
+        <div className="space-y-6">{/* Main content will continue here */}
 
-        {/* Row 3: Education & Experience */}
-        <div className="col-span-1 lg:col-span-3 space-y-6">
+          {/* Clean Business Profile Header */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <EducationCard data={profileData} onChange={handleProfileChange} />
-            <WorkExperienceCard data={profileData} onChange={handleProfileChange} />
+
+            {/* Card 1: Profile Image & Name - Clean Design */}
+            <Card className="border border-border bg-card">
+              <CardHeader className="pb-4">
+                <div className="flex items-center space-x-4 space-x-reverse">
+
+                  {/* Simple Profile Image */}
+                  <div className="w-16 h-16 rounded-lg overflow-hidden border border-border bg-muted">
+                    <AddImage
+                      url={profileData.profileImage || undefined}
+                      alt={profileData.fullName || "الملف الشخصي"}
+                      recordId={profileData.id}
+                      table="user"
+                      tableField="profileImage"
+                      className="w-16 h-16 object-cover"
+                      onUploadComplete={(url) => {
+                        setProfileData(prev => ({ ...prev, profileImage: url }));
+                      }}
+                      folder="profiles"
+                    />
+
+                    {/* Simple Upload Indicator */}
+                    {!profileData.profileImage && (
+                      <div className="w-16 h-16 flex items-center justify-center">
+                        <User className="w-6 h-6 text-muted-foreground" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Simple Name & Info */}
+                  <div className="flex-1">
+                    <h2 className="text-lg font-semibold text-foreground">
+                      {profileData.fullName || "اسم الموظف"}
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      موظف نشط
+                    </p>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
+
+            {/* Card 2: Progress & Actions - Clean Design */}
+            <Card className="border border-border bg-card">
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+
+                  {/* Simple Progress Display */}
+                  <div className="flex items-center space-x-3 space-x-reverse">
+                    <div className="w-12 h-12 rounded-lg border-2 border-primary bg-primary/10 flex items-center justify-center">
+                      <span className="text-sm font-semibold text-primary">
+                        {calculateProfileCompletion(profileData)}%
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-foreground">اكتمال الملف</h3>
+                      <p className="text-xs text-muted-foreground">البيانات المطلوبة</p>
+                    </div>
+                  </div>
+
+                  {/* Simple Save Button */}
+                  <Button
+                    onClick={handleGlobalSave}
+                    disabled={saving}
+                    className="px-4 py-2"
+                    size="sm"
+                  >
+                    {saving ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
+                        حفظ...
+                      </>
+                    ) : (
+                      "حفظ التغييرات"
+                    )}
+                  </Button>
+                </div>
+              </CardHeader>
+            </Card>
+          </div>
+
+          {/* Clean Employment Information Card */}
+          <Card className="border border-border bg-card">
+            <Collapsible open={isEmploymentOpen} onOpenChange={setIsEmploymentOpen}>
+              <CardHeader className="pb-4">
+                <CollapsibleTrigger asChild>
+                  <CardTitle className="flex items-center justify-between cursor-pointer hover:text-primary transition-colors">
+                    <div className="flex items-center space-x-3 space-x-reverse">
+                      <Building2 className="h-5 w-5 text-primary" />
+                      <div>
+                        <div className="text-base font-semibold text-foreground">معلومات التوظيف</div>
+                        <div className="text-sm text-muted-foreground font-normal">بيانات الوظيفة والعمل</div>
+                      </div>
+                    </div>
+                    <div className={`w-5 h-5 transition-transform duration-200 ${isEmploymentOpen ? 'rotate-180' : ''}`}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
+                        <polyline points="6,9 12,15 18,9" />
+                      </svg>
+                    </div>
+                  </CardTitle>
+                </CollapsibleTrigger>
+              </CardHeader>
+
+              <CollapsibleContent>
+                <CardContent className="space-y-6 pt-0">
+
+                  {/* Contact Information - Clean Display */}
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-medium text-foreground border-b border-border pb-2">معلومات التواصل</h4>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="p-3 bg-muted/50 rounded-lg border border-border">
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <Phone className="w-4 h-4 text-muted-foreground" />
+                          <label className="text-xs font-medium text-muted-foreground">رقم الجوال</label>
+                        </div>
+                        <div className="text-sm font-medium text-foreground mt-1">
+                          {profileData.mobile || "غير محدد"}
+                        </div>
+                      </div>
+
+                      <div className="p-3 bg-muted/50 rounded-lg border border-border">
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <Mail className="w-4 h-4 text-muted-foreground" />
+                          <label className="text-xs font-medium text-muted-foreground">البريد الإلكتروني</label>
+                        </div>
+                        <div className="text-sm font-medium text-foreground mt-1">
+                          {profileData.contactEmail || "غير محدد"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Employment Details - Clean Layout */}
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-medium text-foreground border-b border-border pb-2">تفاصيل الوظيفة</h4>
+
+                    {/* Primary Employment Info */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <Calendar className="w-4 h-4 text-primary" />
+                          <label className="text-xs font-medium text-primary">تاريخ التعيين</label>
+                        </div>
+                        <div className="text-sm font-medium text-foreground mt-1">
+                          {profileData.hireDate ? new Date(profileData.hireDate).toLocaleDateString('ar-SA') : "غير محدد"}
+                        </div>
+                      </div>
+
+                      <div className="p-3 bg-muted/50 rounded-lg border border-border">
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <FileText className="w-4 h-4 text-muted-foreground" />
+                          <label className="text-xs font-medium text-muted-foreground">المسمى الوظيفي</label>
+                        </div>
+                        <div className="text-sm font-medium text-foreground mt-1">
+                          {profileData.jobTitle || "غير محدد"}
+                        </div>
+                      </div>
+
+                      <div className="p-3 bg-muted/50 rounded-lg border border-border">
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <UserCheck className="w-4 h-4 text-muted-foreground" />
+                          <label className="text-xs font-medium text-muted-foreground">المدير المباشر</label>
+                        </div>
+                        <div className="text-sm font-medium text-foreground mt-1">
+                          {profileData.directManagerId || "غير محدد"}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Additional Employment Info */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="p-3 bg-muted/50 rounded-lg border border-border">
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <FileText className="w-4 h-4 text-muted-foreground" />
+                          <label className="text-xs font-medium text-muted-foreground">نوع العقد</label>
+                        </div>
+                        <div className="text-sm font-medium text-foreground mt-1">
+                          {profileData.contractType || "غير محدد"}
+                        </div>
+                      </div>
+
+                      <div className="p-3 bg-muted/50 rounded-lg border border-border">
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <Calendar className="w-4 h-4 text-muted-foreground" />
+                          <label className="text-xs font-medium text-muted-foreground">جدول العمل</label>
+                        </div>
+                        <div className="text-sm font-medium text-foreground mt-1">
+                          {profileData.workSchedule || "غير محدد"}
+                        </div>
+                      </div>
+
+                      <div className="p-3 bg-muted/50 rounded-lg border border-border">
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <DollarSign className="w-4 h-4 text-muted-foreground" />
+                          <label className="text-xs font-medium text-muted-foreground">الراتب الأساسي</label>
+                        </div>
+                        <div className="text-sm font-medium text-foreground mt-1">
+                          {profileData.basicSalary ? `${profileData.basicSalary} ريال` : "غير محدد"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </CollapsibleContent>
+            </Collapsible>
+          </Card>
+
+          {/* Clean Profile Forms Grid */}
+          <div className="space-y-6">
+
+            {/* Profile Forms - Business Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Personal Information - Takes 2 columns */}
+              <div className="lg:col-span-2">
+                <PersonalInfoCard data={profileData} onChange={handleProfileChange} />
+              </div>
+
+              {/* Official Documents - Takes 1 column */}
+              <div className="lg:col-span-1">
+                <OfficialDocumentsCard data={profileData} onChange={handleProfileChange} />
+              </div>
+            </div>
+
+            {/* Contact & Address Information */}
+            <ContactInfoCard data={profileData} onChange={handleProfileChange} />
+
+
           </div>
         </div>
       </div>

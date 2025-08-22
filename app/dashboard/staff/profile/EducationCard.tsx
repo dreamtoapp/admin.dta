@@ -27,27 +27,38 @@ export default function EducationCard({ data, onChange }: EducationCardProps) {
     }
   }, [data.educationSummary]);
 
-  // Always render in edit mode
   return (
-    <Card className="h-fit shadow-sm hover:shadow-md transition-all duration-300 border border-border bg-card">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-3 text-lg">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <GraduationCap className="h-5 w-5 text-primary" />
+    <Card className="h-fit border border-border bg-card">
+
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center space-x-3 space-x-reverse text-base">
+          <GraduationCap className="h-5 w-5 text-primary" />
+          <div>
+            <div className="font-semibold text-foreground">التعليم والمؤهلات</div>
+            <div className="text-sm text-muted-foreground font-normal">الخلفية التعليمية والشهادات الأكاديمية</div>
           </div>
-          التعليم والمؤهلات
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 pb-4">
-        {/* Simple textarea for education summary */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium text-foreground">ملخص التعليم</label>
+
+      <CardContent className="space-y-6">
+        <div className="space-y-4">
+          <label className="text-sm font-medium text-foreground">ملخص التعليم والشهادات</label>
+          
           <Textarea
-            placeholder="أدخل خلفيتك التعليمية..."
+            placeholder="أدخل خلفيتك التعليمية والشهادات...
+
+مثال:
+• بكالوريوس في إدارة الأعمال - جامعة الملك سعود (2019)
+• دبلوم في التسويق الرقمي - معهد التقنية (2020)
+• شهادة PMP - PMI (2021)"
             value={educationSummary}
             onChange={(e) => handleChange(e.target.value)}
-            className="min-h-[120px]"
+            className="min-h-[120px] resize-none"
           />
+          
+          <div className="text-xs text-muted-foreground text-left">
+            {educationSummary.length} حرف
+          </div>
         </div>
       </CardContent>
     </Card>

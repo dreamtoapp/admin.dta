@@ -9,7 +9,6 @@ export interface ProfileData {
   emailVerified: Date | null;
   image: string | null;
   role: UserRole;
-  department: string | null;
   isActive: boolean;
   lastLogin: Date | null;
   createdAt: Date;
@@ -30,10 +29,7 @@ export interface ProfileData {
   // Employment Information (read-only, from backend)
   hireDate: Date | null;
   contractType: 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | null;
-  employmentStatus: 'ACTIVE' | 'INACTIVE' | null;
-  noticePeriod: number | null;
   workSchedule: 'FLEXIBLE' | 'FIXED' | null;
-  workLocation: 'OFFICE' | 'REMOTE' | 'HYBRID' | null;
   directManagerId: string | null;
   jobTitle: string | null;
   jobLevel: string | null;
