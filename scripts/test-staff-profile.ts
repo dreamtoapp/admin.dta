@@ -47,9 +47,8 @@ async function main() {
           isActive: true,
           mobile: '+1234567890',
           contactEmail: 'staff@test.com',
-          addressStreet: '123 Test Street',
           addressCity: 'Test City',
-          addressCountry: 'Test Country',
+          addressCountry: 'SA',
           emergencyContactName: 'Emergency Contact',
           emergencyContactPhone: '+0987654321',
           emergencyContactRelationship: 'Spouse'

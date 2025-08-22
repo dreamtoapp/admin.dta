@@ -14,6 +14,7 @@ import { Phone, Mail, Building2, Edit2, Save, X, User, MapPin, Globe, Search, Ch
 import { ProfileData, ProfileDataUpdate } from "./types";
 import { fetchCountries, fetchCitiesByCountry, Country, City } from "@/lib/utils/location-helpers";
 import LocationDetector from "./LocationDetector";
+import { useSession } from "next-auth/react";
 
 interface ContactInfoCardProps {
   data: ProfileData;
@@ -22,7 +23,6 @@ interface ContactInfoCardProps {
 
 const contactSchema = z.object({
   // Address fields
-  addressStreet: z.string().min(1, "Street address is required"),
   addressCity: z.string().min(1, "City is required"),
   addressCountry: z.string().min(1, "Country is required"),
   latitude: z.number().optional(),
@@ -36,6 +36,7 @@ const contactSchema = z.object({
 type ContactFormValues = z.infer<typeof contactSchema>;
 
 export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps) {
+  const { data: session } = useSession();
   const [saving, setSaving] = useState(false);
   const [countries, setCountries] = useState<Country[]>([]);
   const [cities, setCities] = useState<City[]>([]);
@@ -90,7 +91,6 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
     defaultValues: {
-      addressStreet: data.addressStreet || "",
       addressCity: data.addressCity || "",
       addressCountry: data.addressCountry || "",
       latitude: data.latitude || undefined,
@@ -107,20 +107,29 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
       const parsed = contactSchema.safeParse(values);
       if (!parsed.success) return;
       const v = parsed.data;
+
+      // Check if coordinates are locked for non-admin users
+      const hasExistingCoordinates = data.latitude && data.longitude;
+      const isAdmin = session?.user?.role === 'ADMIN';
+
       const contactData: ProfileDataUpdate = {
-        addressStreet: v.addressStreet,
         addressCity: v.addressCity,
         addressCountry: v.addressCountry,
-        latitude: v.latitude,
-        longitude: v.longitude,
         emergencyContactName: v.emergencyContactName,
         emergencyContactPhone: v.emergencyContactPhone,
         emergencyContactRelationship: v.emergencyContactRelationship,
       };
+
+      // Only include coordinates if user is admin or coordinates don't exist
+      if (isAdmin || !hasExistingCoordinates) {
+        contactData.latitude = v.latitude;
+        contactData.longitude = v.longitude;
+      }
+
       onChange(contactData);
     });
     return () => subscription.unsubscribe();
-  }, [form, onChange]);
+  }, [form, onChange, data.latitude, data.longitude, session?.user?.role]);
 
   // Fetch countries on component mount
   useEffect(() => {
@@ -221,23 +230,24 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
   }, []);
 
   // Handle location updates from LocationDetector
-  const handleLocationUpdate = (data: { latitude: number; longitude: number; address?: any }) => {
-    // Update form with coordinates
-    form.setValue('latitude', data.latitude);
-    form.setValue('longitude', data.longitude);
+  const handleLocationUpdate = (locationData: { latitude: number; longitude: number; address?: any }) => {
+    // Check if coordinates are locked for non-admin users
+    const hasExistingCoordinates = data.latitude && data.longitude;
+    const isAdmin = session?.user?.role === 'ADMIN';
+
+    // Only update coordinates if user is admin or coordinates don't exist
+    if (isAdmin || !hasExistingCoordinates) {
+      // Update form with coordinates
+      form.setValue('latitude', locationData.latitude);
+      form.setValue('longitude', locationData.longitude);
+    } else {
+      console.log("Skipping coordinate update - coordinates are locked for non-admin user");
+      return;
+    }
 
     // If we have address data, update the form fields
-    if (data.address) {
-      const address = data.address;
-
-      // Update street address if available
-      if (address.road) {
-        const streetNumber = address.house_number ? `, ${address.house_number}` : '';
-        const streetName = address.road;
-        form.setValue('addressStreet', `${streetName}${streetNumber}`);
-      } else if (address.suburb) {
-        form.setValue('addressStreet', address.suburb);
-      }
+    if (locationData.address) {
+      const address = locationData.address;
 
       // Update city field - try multiple city-like fields
       if (address.city || address.town || address.village || address.suburb) {
@@ -282,7 +292,7 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
     setLocationError(error);
   };
 
-  const { mobile, contactEmail, addressStreet, addressCity, addressCountry } = data;
+  const { mobile, contactEmail, addressCity, addressCountry } = data;
 
   return (
     <Card className="h-full shadow-sm hover:shadow-md transition-all duration-300 border border-border bg-card">
@@ -313,23 +323,7 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
                 <h4 className="text-sm font-semibold text-foreground">Address Information</h4>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="flex items-center gap-3 p-3 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg border border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-200">
-                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                    <MapPin className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-1">Street Address</label>
-                    <div className="text-sm font-semibold text-foreground">
-                      {addressStreet ? (
-                        <span className="block truncate">{addressStreet}</span>
-                      ) : (
-                        <span className="text-muted-foreground italic text-xs">Not provided</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3 p-3 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg border border-green-200 dark:border-green-800 hover:border-green-300 dark:hover:border-green-700 transition-all duration-200">
                   <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-full">
                     <Building2 className="h-4 w-4 text-green-600 dark:text-green-400" />

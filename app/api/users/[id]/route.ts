@@ -165,11 +165,51 @@ export async function PUT(
     if (updateData.contactEmail !== undefined) updateFields.contactEmail = updateData.contactEmail;
 
     // Flattened Address (Staff editable)
-    if (updateData.addressStreet !== undefined) updateFields.addressStreet = updateData.addressStreet;
     if (updateData.addressCity !== undefined) updateFields.addressCity = updateData.addressCity;
     if (updateData.addressCountry !== undefined) updateFields.addressCountry = updateData.addressCountry;
-    if (updateData.latitude !== undefined) updateFields.latitude = updateData.latitude;
-    if (updateData.longitude !== undefined) updateFields.longitude = updateData.longitude;
+
+    // Coordinate validation and admin-only modification
+    if (updateData.latitude !== undefined || updateData.longitude !== undefined) {
+      // Check if user is trying to modify existing coordinates
+      const existingUser = await prisma.user.findUnique({
+        where: { id },
+        select: { latitude: true, longitude: true }
+      });
+
+      const hasExistingCoordinates = existingUser?.latitude && existingUser?.longitude;
+
+      // If coordinates exist and user is not admin, prevent modification
+      if (hasExistingCoordinates && session.user.role !== UserRole.ADMIN) {
+        console.log("User attempted to modify existing coordinates without admin privileges");
+        return NextResponse.json(
+          { message: 'Coordinates are locked. Only administrators can modify existing coordinates.' },
+          { status: 403 }
+        );
+      }
+
+      // Validate new coordinates
+      if (updateData.latitude !== undefined) {
+        const lat = Number(updateData.latitude);
+        if (isNaN(lat) || lat < -90 || lat > 90) {
+          return NextResponse.json(
+            { message: 'Invalid latitude. Must be between -90 and 90.' },
+            { status: 400 }
+          );
+        }
+        updateFields.latitude = lat;
+      }
+
+      if (updateData.longitude !== undefined) {
+        const lng = Number(updateData.longitude);
+        if (isNaN(lng) || lng < -180 || lng > 180) {
+          return NextResponse.json(
+            { message: 'Invalid longitude. Must be between -180 and 180.' },
+            { status: 400 }
+          );
+        }
+        updateFields.longitude = lng;
+      }
+    }
 
     // Flattened Emergency Contact (Staff editable)
     if (updateData.emergencyContactName !== undefined) updateFields.emergencyContactName = updateData.emergencyContactName;

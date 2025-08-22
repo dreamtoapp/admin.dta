@@ -14,7 +14,6 @@
 - `alternativeEmail`
 
 ### 3. Address can not edit one time only when added if he want to update should have token
-- `addressStreet`
 - `addressCity`
 - `addressCountry`
 

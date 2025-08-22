@@ -188,8 +188,7 @@ export interface UpdateUserProfileRequest {
   mobile?: string;
   contactEmail?: string;
 
-  // Address Information (flattened)
-  addressStreet?: string;
+  // Address Information
   addressCity?: string;
   addressCountry?: string;
   latitude?: number;

@@ -14,13 +14,7 @@ export default async function StaffProfilePage() {
         <h1 className="text-3xl font-bold text-foreground">My Profile</h1>
         <p className="text-muted-foreground mt-2">Update your personal information</p>
       </div>
-      <StaffProfileClient user={{
-        id: session.user.id,
-        name: session.user.name || session.user.fullName || null,
-        email: session.user.email || "",
-        role: session.user.role,
-        department: (session.user as any).department,
-      }} />
+      <StaffProfileClient />
     </div>
   );
 }

@@ -98,10 +98,9 @@ model User {
   certifications   String? // Professional certifications
   professionalDevelopment String? // Continuous learning
 
-  // Address (flattened)
-  addressStreet    String?
-  addressCity      String?
-  addressCountry   String?
+  // Address Information (flattened for easier access)
+  addressCity    String?
+  addressCountry String?
   latitude         Float?
   longitude        Float?
 

@@ -1,5 +1,3 @@
-import fetch from 'node-fetch';
-
 async function testAPIEndpoint() {
   try {
     console.log('🧪 Testing API endpoint...');

@@ -53,10 +53,9 @@ export interface ProfileData {
   certifications: string | null;
   professionalDevelopment: string | null;
 
-  // Address (flattened)
-  addressStreet: string | null;
-  addressCity: string | null;
-  addressCountry: string | null;
+  // Address Information
+  addressCity?: string;
+  addressCountry?: string;
   latitude: number | null;
   longitude: number | null;
 

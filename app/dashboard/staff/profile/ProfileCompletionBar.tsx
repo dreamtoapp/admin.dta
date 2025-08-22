@@ -13,7 +13,7 @@ export default function ProfileCompletionBar({ data }: ProfileCompletionBarProps
   // Calculate completion based on required fields (simplified approach)
   const requiredFields = [
     'fullName', 'mobile', 'contactEmail',
-    'addressStreet', 'addressCity', 'addressCountry',
+    'addressCity', 'addressCountry',
     'emergencyContactName', 'emergencyContactPhone', 'emergencyContactRelationship'
   ];
 

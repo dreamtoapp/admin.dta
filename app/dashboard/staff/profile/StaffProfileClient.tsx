@@ -73,9 +73,8 @@ export default function StaffProfileClient() {
     professionalDevelopment: null,
 
     // Address (flattened)
-    addressStreet: null,
-    addressCity: null,
-    addressCountry: null,
+    addressCity: undefined,
+    addressCountry: undefined,
     latitude: null,
     longitude: null,
 
@@ -94,7 +93,7 @@ export default function StaffProfileClient() {
   const calculateProfileCompletion = (data: ProfileData): number => {
     const requiredFields = [
       'fullName', 'mobile', 'contactEmail',
-      'addressStreet', 'addressCity', 'addressCountry',
+      'addressCity', 'addressCountry',
       'emergencyContactName', 'emergencyContactPhone', 'emergencyContactRelationship'
     ];
 
@@ -201,9 +200,8 @@ export default function StaffProfileClient() {
             englishProficiency: null,
             certifications: null,
             professionalDevelopment: null,
-            addressStreet: null,
-            addressCity: null,
-            addressCountry: null,
+            addressCity: undefined,
+            addressCountry: undefined,
             latitude: null,
             longitude: null,
             emergencyContactName: null,
@@ -261,9 +259,8 @@ export default function StaffProfileClient() {
           englishProficiency: null,
           certifications: null,
           professionalDevelopment: null,
-          addressStreet: null,
-          addressCity: null,
-          addressCountry: null,
+          addressCity: undefined,
+          addressCountry: undefined,
           latitude: null,
           longitude: null,
           emergencyContactName: null,
@@ -287,7 +284,7 @@ export default function StaffProfileClient() {
         // Contact
         "mobile", "contactEmail",
         // Address
-        "addressStreet", "addressCity", "addressCountry", "latitude", "longitude",
+        "addressCity", "addressCountry", "latitude", "longitude",
         // Emergency
         "emergencyContactName", "emergencyContactPhone", "emergencyContactRelationship",
         // Education & Skills
@@ -373,11 +370,30 @@ export default function StaffProfileClient() {
       if (profileData.contactEmail !== undefined) fieldsToUpdate.contactEmail = profileData.contactEmail;
 
       // Address Information
-      if (profileData.addressStreet !== undefined) fieldsToUpdate.addressStreet = profileData.addressStreet;
       if (profileData.addressCity !== undefined) fieldsToUpdate.addressCity = profileData.addressCity;
       if (profileData.addressCountry !== undefined) fieldsToUpdate.addressCountry = profileData.addressCountry;
-      if (profileData.latitude !== undefined) fieldsToUpdate.latitude = profileData.latitude;
-      if (profileData.longitude !== undefined) fieldsToUpdate.longitude = profileData.longitude;
+
+      // Coordinate handling - only update if user is admin or coordinates don't exist
+      const hasExistingCoordinates = profileData.latitude && profileData.longitude;
+      const isAdmin = session?.user?.role === 'ADMIN';
+
+      if (profileData.latitude !== undefined) {
+        // Only include latitude if user is admin or coordinates don't exist
+        if (isAdmin || !hasExistingCoordinates) {
+          fieldsToUpdate.latitude = profileData.latitude;
+        } else {
+          console.log("Skipping latitude update - coordinates are locked for non-admin user");
+        }
+      }
+
+      if (profileData.longitude !== undefined) {
+        // Only include longitude if user is admin or coordinates don't exist
+        if (isAdmin || !hasExistingCoordinates) {
+          fieldsToUpdate.longitude = profileData.longitude;
+        } else {
+          console.log("Skipping longitude update - coordinates are locked for non-admin user");
+        }
+      }
 
       // Emergency Contact
       if (profileData.emergencyContactName !== undefined) fieldsToUpdate.emergencyContactName = profileData.emergencyContactName;
