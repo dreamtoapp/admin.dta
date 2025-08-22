@@ -44,10 +44,10 @@ export default function LocationDetector({
     // If coordinates exist and user is not admin, show alert and prevent detection
     if (hasValidCoordinates && !isAdmin) {
       Swal.fire({
-        title: 'Coordinates Locked',
-        text: 'Location coordinates are already set and can only be modified by administrators. Please contact your admin to update coordinates.',
+        title: 'إحداثيات مقفلة',
+        text: 'إحداثيات الموقع محددة بالفعل ولا يمكن تعديلها إلا من قبل المسؤولين. يرجى الاتصال بالمسؤول لتحديث الإحداثيات.',
         icon: 'warning',
-        confirmButtonText: 'OK',
+        confirmButtonText: 'حسناً',
         confirmButtonColor: '#f59e0b'
       });
       return;
@@ -59,7 +59,7 @@ export default function LocationDetector({
     try {
       // First check if geolocation is supported
       if (!navigator.geolocation) {
-        const errorMsg = 'Geolocation is not supported by this browser';
+        const errorMsg = 'تحديد الموقع الجغرافي غير مدعوم في هذا المتصفح';
         setLocationError(errorMsg);
         onError?.(errorMsg);
         return;
@@ -72,7 +72,7 @@ export default function LocationDetector({
           },
           (err: GeolocationPositionError) => {
             // Create a proper error object that we can handle
-            const geolocationError = new Error(`Geolocation error: ${err.message || 'Unknown error'}`);
+            const geolocationError = new Error(`خطأ في تحديد الموقع: ${err.message || 'خطأ غير معروف'}`);
             (geolocationError as any).code = err.code;
             (geolocationError as any).PERMISSION_DENIED = 1;
             (geolocationError as any).POSITION_UNAVAILABLE = 2;
@@ -92,7 +92,7 @@ export default function LocationDetector({
 
       // Validate new coordinates
       if (!isValidCoordinate(newLat, newLng)) {
-        const errorMsg = 'Invalid coordinates detected. Please try again.';
+        const errorMsg = 'تم اكتشاف إحداثيات غير صحيحة. يرجى المحاولة مرة أخرى.';
         setLocationError(errorMsg);
         onError?.(errorMsg);
         return;
@@ -120,23 +120,23 @@ export default function LocationDetector({
 
     } catch (error: unknown) {
       // Better error handling for geolocation errors
-      let errorMessage = 'Failed to detect location';
+      let errorMessage = 'فشل في تحديد الموقع';
 
       // Check if it's a geolocation error with code
       if (error && typeof error === 'object' && (error as any).code !== undefined) {
         const errorCode = (error as any).code;
         switch (errorCode) {
           case 1:
-            errorMessage = 'Location access denied. Please allow location access in your browser settings.';
+            errorMessage = 'تم رفض الوصول للموقع. يرجى السماح بالوصول للموقع في إعدادات المتصفح.';
             break;
           case 2:
-            errorMessage = 'Location information is unavailable. Please try again.';
+            errorMessage = 'معلومات الموقع غير متاحة. يرجى المحاولة مرة أخرى.';
             break;
           case 3:
-            errorMessage = 'Location request timed out. Please try again.';
+            errorMessage = 'انتهت مهلة طلب الموقع. يرجى المحاولة مرة أخرى.';
             break;
           default:
-            errorMessage = `Geolocation error code: ${errorCode}`;
+            errorMessage = `رمز خطأ تحديد الموقع: ${errorCode}`;
         }
       } else if (error instanceof Error) {
         errorMessage = error.message;
@@ -145,14 +145,14 @@ export default function LocationDetector({
         if (errorObj.message) {
           errorMessage = errorObj.message;
         } else if (errorObj.name) {
-          errorMessage = `Error: ${errorObj.name}`;
+          errorMessage = `خطأ: ${errorObj.name}`;
         } else {
-          errorMessage = `Unknown error: ${JSON.stringify(error)}`;
+          errorMessage = `خطأ غير معروف: ${JSON.stringify(error)}`;
         }
       } else if (typeof error === 'string') {
         errorMessage = error;
       } else {
-        errorMessage = `Unexpected error type: ${typeof error}`;
+        errorMessage = `نوع خطأ غير متوقع: ${typeof error}`;
       }
 
       // Set the error state and notify parent
@@ -168,12 +168,12 @@ export default function LocationDetector({
       {/* Location Detection Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h4 className="text-sm font-semibold text-foreground">Location Coordinates</h4>
+          <h4 className="text-sm font-semibold text-foreground">إحداثيات الموقع</h4>
           {hasValidCoordinates && (
             <div className="flex items-center gap-1">
               <Lock
                 className="h-4 w-4 text-amber-500"
-                aria-label="Coordinates locked - Admin only"
+                aria-label="الإحداثيات مقفلة - للمسؤولين فقط"
               />
             </div>
           )}
@@ -187,19 +187,19 @@ export default function LocationDetector({
           className="flex items-center gap-2"
           title={
             hasValidCoordinates && !isAdmin
-              ? 'Coordinates are locked. Only administrators can modify existing coordinates.'
-              : 'Auto-detect your current location'
+              ? 'الإحداثيات مقفلة. يمكن للمسؤولين فقط تعديل الإحداثيات الموجودة.'
+              : 'تحديد موقعك الحالي تلقائياً'
           }
         >
           {isDetectingLocation ? (
             <>
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-              Detecting...
+              جاري التحديد...
             </>
           ) : (
             <>
               <MapPin className="h-4 w-4" />
-              {hasValidCoordinates ? 'Re-detect Location' : 'Auto-detect Location'}
+              {hasValidCoordinates ? 'إعادة تحديد الموقع' : 'تحديد الموقع تلقائياً'}
             </>
           )}
         </Button>
@@ -209,7 +209,7 @@ export default function LocationDetector({
       {hasValidCoordinates && (
         <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
           <p className="text-sm text-amber-600 dark:text-amber-400">
-            <strong>Status:</strong> Coordinates are set and locked. Only administrators can modify existing coordinates.
+            <strong>الحالة:</strong> الإحداثيات محددة ومقفلة. يمكن للمسؤولين فقط تعديل الإحداثيات الموجودة.
           </p>
         </div>
       )}
@@ -218,7 +218,7 @@ export default function LocationDetector({
       {locationError && (
         <div className="p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg">
           <p className="text-sm text-red-600 dark:text-red-400">
-            <strong>Location Error:</strong> {locationError}
+            <strong>خطأ في الموقع:</strong> {locationError}
           </p>
         </div>
       )}
@@ -227,35 +227,35 @@ export default function LocationDetector({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <label className="text-xs font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wide">
-            Latitude
+            خط العرض
           </label>
           <div className={`p-3 border rounded-lg ${hasValidCoordinates
             ? 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800'
             : 'bg-gray-50 dark:bg-gray-950/20 border-gray-200 dark:border-gray-800'
             }`}>
             <span className="text-sm font-mono text-foreground">
-              {latitude ? latitude : 'Not detected'}
+              {latitude ? latitude : 'غير محدد'}
             </span>
           </div>
         </div>
 
         <div className="space-y-2">
           <label className="text-xs font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wide">
-            Longitude
+            خط الطول
           </label>
           <div className={`p-3 border rounded-lg ${hasValidCoordinates
             ? 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800'
             : 'bg-gray-50 dark:bg-gray-950/20 border-gray-200 dark:border-gray-800'
             }`}>
             <span className="text-sm font-mono text-foreground">
-              {longitude ? longitude : 'Not detected'}
+              {longitude ? longitude : 'غير محدد'}
             </span>
           </div>
         </div>
 
         <div className="space-y-2">
           <label className="text-xs font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wide">
-            Map View
+            عرض الخريطة
           </label>
           {latitude && longitude ? (
             <Button
@@ -270,12 +270,12 @@ export default function LocationDetector({
               className="flex items-center gap-2 text-amber-600 border-amber-200 hover:bg-amber-50 w-full h-[42px]"
             >
               <Globe className="h-4 w-4" />
-              View on Google Maps
+              عرض على خرائط جوجل
             </Button>
           ) : (
             <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg flex items-center justify-center h-[42px]">
               <span className="text-sm text-muted-foreground">
-                Enter coordinates to view on map
+                أدخل الإحداثيات لعرضها على الخريطة
               </span>
             </div>
           )}

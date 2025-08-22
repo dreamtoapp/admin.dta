@@ -35,15 +35,15 @@ export default function EducationCard({ data, onChange }: EducationCardProps) {
           <div className="p-2 bg-primary/10 rounded-lg">
             <GraduationCap className="h-5 w-5 text-primary" />
           </div>
-          Education & Qualifications
+          التعليم والمؤهلات
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4 pb-4">
         {/* Simple textarea for education summary */}
         <div className="space-y-3">
-          <label className="text-sm font-medium text-foreground">Education Summary</label>
+          <label className="text-sm font-medium text-foreground">ملخص التعليم</label>
           <Textarea
-            placeholder="Enter your education background..."
+            placeholder="أدخل خلفيتك التعليمية..."
             value={educationSummary}
             onChange={(e) => handleChange(e.target.value)}
             className="min-h-[120px]"

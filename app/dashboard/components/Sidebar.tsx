@@ -42,40 +42,40 @@ export default function Sidebar({ user }: SidebarProps) {
 
   const navigationItems = {
     admin: [
-      { name: "Overview", href: "/dashboard/admin", icon: Home },
-      { name: "Task Management", href: "/dashboard/admin/tasks", icon: ClipboardList },
-      { name: "Staff Management", href: "/dashboard/admin/staff", icon: Users },
-      { name: "Work Logs", href: "/dashboard/admin/worklogs", icon: FileText },
-      { name: "Performance", href: "/dashboard/admin/performance", icon: BarChart3 },
-      { name: "Settings", href: "/dashboard/admin/settings", icon: Settings },
+      { name: "نظرة عامة", href: "/dashboard/admin", icon: Home },
+      { name: "إدارة المهام", href: "/dashboard/admin/tasks", icon: ClipboardList },
+      { name: "إدارة الموظفين", href: "/dashboard/admin/staff", icon: Users },
+      { name: "سجلات العمل", href: "/dashboard/admin/worklogs", icon: FileText },
+      { name: "الأداء", href: "/dashboard/admin/performance", icon: BarChart3 },
+      { name: "الإعدادات", href: "/dashboard/admin/settings", icon: Settings },
     ],
     staff: [
-      { name: "Dashboard", href: "/dashboard/staff", icon: Home },
-      { name: "My Tasks", href: "/dashboard/staff/tasks", icon: ClipboardList },
-      { name: "Work Logs", href: "/dashboard/staff/worklogs", icon: FileText },
-      { name: "Profile", href: "/dashboard/staff/profile", icon: User },
+      { name: "لوحة التحكم", href: "/dashboard/staff", icon: Home },
+      { name: "مهامي", href: "/dashboard/staff/tasks", icon: ClipboardList },
+      { name: "سجلات العمل", href: "/dashboard/staff/worklogs", icon: FileText },
+      { name: "الملف الشخصي", href: "/dashboard/staff/profile", icon: User },
     ],
     client: [
-      { name: "Dashboard", href: "/dashboard/client", icon: Home },
-      { name: "My Projects", href: "/dashboard/client/projects", icon: Briefcase },
-      { name: "Consultations", href: "/dashboard/client/consultations", icon: MessageSquare },
-      { name: "Profile", href: "/dashboard/client/profile", icon: User },
+      { name: "لوحة التحكم", href: "/dashboard/client", icon: Home },
+      { name: "مشاريعي", href: "/dashboard/client/projects", icon: Briefcase },
+      { name: "الاستشارات", href: "/dashboard/client/consultations", icon: MessageSquare },
+      { name: "الملف الشخصي", href: "/dashboard/client/profile", icon: User },
     ],
   };
 
   const quickActions = {
     admin: [
-      { name: "New Client", href: "/dashboard/admin/new-client", icon: Users, color: "bg-secondary" },
-      { name: "Add Staff Member", href: "/dashboard/admin/staff/new", icon: UserPlus, color: "bg-success" },
-      { name: "Create New Task", href: "/dashboard/admin/tasks/create", icon: Plus, color: "bg-primary" },
+      { name: "عميل جديد", href: "/dashboard/admin/new-client", icon: Users, color: "bg-secondary" },
+      { name: "إضافة موظف", href: "/dashboard/admin/staff/new", icon: UserPlus, color: "bg-success" },
+      { name: "إنشاء مهمة جديدة", href: "/dashboard/admin/tasks/create", icon: Plus, color: "bg-primary" },
     ],
     staff: [
-      { name: "Start Task", href: "/dashboard/staff/tasks/start", icon: Play, color: "bg-success" },
-      { name: "Log Work", href: "/dashboard/staff/worklogs/new", icon: FileText, color: "bg-primary" },
+      { name: "بدء مهمة", href: "/dashboard/staff/tasks/start", icon: Play, color: "bg-success" },
+      { name: "تسجيل عمل", href: "/dashboard/staff/worklogs/new", icon: FileText, color: "bg-primary" },
     ],
     client: [
-      { name: "New Project", href: "/dashboard/client/projects/new", icon: Plus, color: "bg-success" },
-      { name: "Book Consultation", href: "/dashboard/client/consultations/new", icon: Calendar, color: "bg-primary" },
+      { name: "مشروع جديد", href: "/dashboard/client/projects/new", icon: Plus, color: "bg-success" },
+      { name: "حجز استشارة", href: "/dashboard/client/consultations/new", icon: Calendar, color: "bg-primary" },
     ],
   };
 
@@ -112,7 +112,7 @@ export default function Sidebar({ user }: SidebarProps) {
               <Building2 className="h-8 w-8 text-primary" />
               <div>
                 <h2 className="text-lg font-bold text-foreground">DreamToApp</h2>
-                <p className="text-xs text-muted-foreground capitalize">{user.role} Dashboard</p>
+                <p className="text-xs text-muted-foreground capitalize">لوحة تحكم {user.role === 'STAFF' ? 'الموظفين' : user.role === 'ADMIN' ? 'المدير' : 'العميل'}</p>
               </div>
             </div>
             <Button
@@ -136,11 +136,11 @@ export default function Sidebar({ user }: SidebarProps) {
               </Avatar>
               <div className="min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">
-                  {user.name || 'User'}
+                  {user.name || 'مستخدم'}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                 <Badge variant="secondary" className="mt-1 text-xs capitalize">
-                  {user.role}
+                  {user.role === 'STAFF' ? 'موظف' : user.role === 'ADMIN' ? 'مدير' : 'عميل'}
                 </Badge>
               </div>
             </div>
@@ -201,7 +201,7 @@ export default function Sidebar({ user }: SidebarProps) {
               onClick={() => signOut({ callbackUrl: "/" })}
             >
               <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
+              تسجيل الخروج
             </Button>
           </div>
         </div>

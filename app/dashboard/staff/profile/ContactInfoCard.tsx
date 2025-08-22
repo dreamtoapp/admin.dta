@@ -23,14 +23,14 @@ interface ContactInfoCardProps {
 
 const contactSchema = z.object({
   // Address fields
-  addressCity: z.string().min(1, "City is required"),
-  addressCountry: z.string().min(1, "Country is required"),
+  addressCity: z.string().min(1, "المدينة مطلوبة"),
+  addressCountry: z.string().min(1, "البلد مطلوب"),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   // Emergency contact fields
-  emergencyContactName: z.string().min(1, "Emergency contact name is required"),
-  emergencyContactPhone: z.string().min(1, "Emergency contact phone is required"),
-  emergencyContactRelationship: z.string().min(1, "Emergency contact relationship is required"),
+  emergencyContactName: z.string().min(1, "اسم جهة الاتصال في الطوارئ مطلوب"),
+  emergencyContactPhone: z.string().min(1, "رقم هاتف جهة الاتصال في الطوارئ مطلوب"),
+  emergencyContactRelationship: z.string().min(1, "علاقة جهة الاتصال في الطوارئ مطلوبة"),
 });
 
 type ContactFormValues = z.infer<typeof contactSchema>;
@@ -63,13 +63,13 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-red-600">
             <Phone className="h-5 w-5" />
-            Error Loading Contact Information
+            خطأ في تحميل معلومات الاتصال
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="p-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg">
             <p className="text-sm text-red-600 dark:text-red-400 mb-4">
-              Something went wrong while loading the contact information.
+              حدث خطأ أثناء تحميل معلومات الاتصال.
             </p>
             <Button
               onClick={() => {
@@ -80,7 +80,7 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
               variant="outline"
               size="sm"
             >
-              Try Again
+              حاول مرة أخرى
             </Button>
           </div>
         </CardContent>
@@ -211,13 +211,13 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
     const handleGlobalError = (event: ErrorEvent) => {
       console.error('Global error caught:', event.error);
       setHasError(true);
-      setLocationError('A system error occurred. Please refresh the page and try again.');
+      setLocationError('حدث خطأ في النظام. يرجى تحديث الصفحة والمحاولة مرة أخرى.');
     };
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       console.error('Unhandled promise rejection:', event.reason);
       setHasError(true);
-      setLocationError('A system error occurred. Please refresh the page and try again.');
+      setLocationError('حدث خطأ في النظام. يرجى تحديث الصفحة والمحاولة مرة أخرى.');
     };
 
     window.addEventListener('error', handleGlobalError);
@@ -303,7 +303,7 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
             <div className="space-y-4">
               <div className="flex items-center gap-2 pb-2 border-b border-border">
                 <Phone className="h-4 w-4 text-primary" />
-                <h4 className="text-sm font-semibold text-foreground">Contact Information</h4>
+                <h4 className="text-sm font-semibold text-foreground">معلومات الاتصال</h4>
               </div>
             </div>
 
@@ -320,7 +320,7 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
             <div className="space-y-4">
               <div className="flex items-center gap-2 pb-2 border-b border-border">
                 <MapPin className="h-4 w-4 text-primary" />
-                <h4 className="text-sm font-semibold text-foreground">Address Information</h4>
+                <h4 className="text-sm font-semibold text-foreground">معلومات العنوان</h4>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -329,12 +329,12 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
                     <Building2 className="h-4 w-4 text-green-600 dark:text-green-400" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <label className="text-xs font-medium text-green-600 dark:text-green-400 uppercase tracking-wide mb-1">City</label>
+                    <label className="text-xs font-medium text-green-600 dark:text-green-400 uppercase tracking-wide mb-1">المدينة</label>
                     <div className="text-sm font-semibold text-foreground">
                       {addressCity ? (
                         <span className="block truncate">{addressCity}</span>
                       ) : (
-                        <span className="text-muted-foreground italic text-xs">Not provided</span>
+                        <span className="text-muted-foreground italic text-xs">غير محدد</span>
                       )}
                     </div>
                   </div>
@@ -345,7 +345,7 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
                     <Globe className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <label className="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wide mb-1">Country</label>
+                    <label className="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wide mb-1">البلد</label>
                     <div className="text-sm font-semibold text-foreground">
                       {addressCountry ? (
                         <div className="flex items-center gap-2">
@@ -357,7 +357,7 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
                           </span>
                         </div>
                       ) : (
-                        <span className="text-muted-foreground italic text-xs">Not provided</span>
+                        <span className="text-muted-foreground italic text-xs">غير محدد</span>
                       )}
                     </div>
                   </div>
@@ -369,7 +369,7 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
             <div className="space-y-4 pt-4 border-t border-border">
               <div className="flex items-center gap-2 pb-2">
                 <User className="h-4 w-4 text-red-500" />
-                <h4 className="text-sm font-semibold text-foreground">Emergency Contact</h4>
+                <h4 className="text-sm font-semibold text-foreground">جهة الاتصال في الطوارئ</h4>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -378,10 +378,10 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
                   name="emergencyContactName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs font-medium text-red-600 dark:text-red-400 uppercase tracking-wide">Contact Name *</FormLabel>
+                      <FormLabel className="text-xs font-medium text-red-600 dark:text-red-400 uppercase tracking-wide">اسم جهة الاتصال *</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Emergency contact name"
+                          placeholder="اسم جهة الاتصال في الطوارئ"
                           {...field}
                           className="border-red-200 focus:border-red-400"
                         />
@@ -396,10 +396,10 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
                   name="emergencyContactPhone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs font-medium text-orange-600 dark:text-orange-400 uppercase tracking-wide">Phone Number *</FormLabel>
+                      <FormLabel className="text-xs font-medium text-orange-600 dark:text-orange-400 uppercase tracking-wide">رقم الهاتف *</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Emergency contact phone"
+                          placeholder="رقم هاتف جهة الاتصال في الطوارئ"
                           {...field}
                           className="border-orange-200 focus:border-orange-400"
                         />
@@ -414,10 +414,10 @@ export default function ContactInfoCard({ data, onChange }: ContactInfoCardProps
                   name="emergencyContactRelationship"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs font-medium text-teal-600 dark:text-teal-400 uppercase tracking-wide">Relationship *</FormLabel>
+                      <FormLabel className="text-xs font-medium text-teal-600 dark:text-teal-400 uppercase tracking-wide">العلاقة *</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="e.g., Spouse, Parent, Sibling"
+                          placeholder="مثل: زوج، والد، شقيق"
                           {...field}
                           className="border-teal-200 focus:border-teal-400"
                         />

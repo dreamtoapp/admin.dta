@@ -35,15 +35,15 @@ export default function WorkExperienceCard({ data, onChange }: WorkExperienceCar
           <div className="p-2 bg-primary/10 rounded-lg">
             <Briefcase className="h-5 w-5 text-primary" />
           </div>
-          Work Experience
+          الخبرة العملية
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4 pb-4">
         {/* Simple textarea for work experience summary */}
         <div className="space-y-3">
-          <label className="text-sm font-medium text-foreground">Work Experience Summary</label>
+          <label className="text-sm font-medium text-foreground">ملخص الخبرة العملية</label>
           <Textarea
-            placeholder="Enter your work experience..."
+            placeholder="أدخل خبرتك العملية..."
             value={workExperienceSummary}
             onChange={(e) => handleChange(e.target.value)}
             className="min-h-[120px]"

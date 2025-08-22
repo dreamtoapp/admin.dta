@@ -21,7 +21,7 @@ interface OfficialDocumentsCardProps {
 
 const officialDocumentsSchema = z.object({
   documentType: z.enum(["ID_CARD", "PASSPORT"]).nullable().optional(),
-  documentImage: z.string().min(1, "Document image URL is required"),
+  documentImage: z.string().min(1, "رابط صورة المستند مطلوب"),
 });
 
 type OfficialDocumentsFormValues = z.infer<typeof officialDocumentsSchema>;
@@ -60,7 +60,7 @@ export default function OfficialDocumentsCard({ data, onChange }: OfficialDocume
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2">
           <FileText className="h-5 w-5 text-primary" />
-          Official Documents
+          المستندات الرسمية
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">
@@ -74,12 +74,12 @@ export default function OfficialDocumentsCard({ data, onChange }: OfficialDocume
                   <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
                     <FormControl>
                       <SelectTrigger className="h-11">
-                        <SelectValue placeholder="Select document type" />
+                        <SelectValue placeholder="اختر نوع المستند" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="ID_CARD">ID Card</SelectItem>
-                      <SelectItem value="PASSPORT">Passport</SelectItem>
+                      <SelectItem value="ID_CARD">بطاقة الهوية</SelectItem>
+                      <SelectItem value="PASSPORT">جواز السفر</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -93,31 +93,24 @@ export default function OfficialDocumentsCard({ data, onChange }: OfficialDocume
                 <div className="w-full aspect-square ring-2 ring-border rounded-lg overflow-hidden">
                   <AddImage
                     url={documentImage || undefined}
-                    alt={`${documentType || 'Document'} Image`}
+                    alt={`صورة ${documentType === 'ID_CARD' ? 'بطاقة الهوية' : documentType === 'PASSPORT' ? 'جواز السفر' : 'المستند'}`}
                     recordId={data.id}
                     table="user"
                     tableField="documentImage"
                     className="w-full aspect-square"
                     onUploadComplete={(url) => {
                       onChange({ documentImage: url });
-                      form.setValue("documentImage", url);
                     }}
-                    folder="documents"
+                    folder={"documents"}
                   />
                 </div>
-                <div className="text-center mt-2">
-                  <p className="text-sm text-muted-foreground">
-                    Upload a clear image of your {documentType === 'PASSPORT' ? 'passport' : documentType === 'ID_CARD' ? 'ID card' : 'document'}.
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    JPG, PNG, PDF (max 5MB)
-                  </p>
-                </div>
               </div>
-              <FormMessage />
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">
+                  {documentImage ? "تم رفع صورة المستند" : "لم يتم رفع صورة المستند بعد"}
+                </p>
+              </div>
             </div>
-
-            {/* Global Save/Cancel handled in header */}
           </form>
         </Form>
       </CardContent>

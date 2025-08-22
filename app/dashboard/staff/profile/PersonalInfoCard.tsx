@@ -11,9 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ProfileData, ProfileDataUpdate } from "./types";
 
 const personalSchema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
+  fullName: z.string().min(1, "الاسم الكامل مطلوب"),
   mobile: z.string().optional(),
-  contactEmail: z.string().email("Invalid email address").optional(),
+  contactEmail: z.string().email("عنوان البريد الإلكتروني غير صحيح").optional(),
   dateOfBirth: z.string().optional(),
   gender: z.enum(["MALE", "FEMALE"]).nullable().optional(),
   maritalStatus: z.enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"]).nullable().optional(),
@@ -77,7 +77,7 @@ export default function PersonalInfoCard({ data, onChange }: PersonalInfoCardPro
   return (
     <Card className="h-full">
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-semibold text-foreground">Personal Information</CardTitle>
+        <CardTitle className="text-lg font-semibold text-foreground">المعلومات الشخصية</CardTitle>
       </CardHeader>
       <CardContent className="p-6">
         <Form {...form}>
@@ -87,10 +87,10 @@ export default function PersonalInfoCard({ data, onChange }: PersonalInfoCardPro
               name="fullName"
               render={({ field }) => (
                 <FormItem className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Full Name</label>
+                  <label className="text-sm font-medium text-muted-foreground">الاسم الكامل</label>
                   <FormControl>
                     <Input
-                      placeholder="Enter your full name"
+                      placeholder="أدخل اسمك الكامل"
                       {...field}
                       className="h-11"
                     />
@@ -106,10 +106,10 @@ export default function PersonalInfoCard({ data, onChange }: PersonalInfoCardPro
                 name="mobile"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <label className="text-sm font-medium text-muted-foreground">Mobile</label>
+                    <label className="text-sm font-medium text-muted-foreground">رقم الجوال</label>
                     <FormControl>
                       <Input
-                        placeholder="Enter mobile number"
+                        placeholder="أدخل رقم الجوال"
                         {...field}
                         className="h-11"
                       />
@@ -124,11 +124,11 @@ export default function PersonalInfoCard({ data, onChange }: PersonalInfoCardPro
                 name="contactEmail"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <label className="text-sm font-medium text-muted-foreground">Contact Email</label>
+                    <label className="text-sm font-medium text-muted-foreground">البريد الإلكتروني للتواصل</label>
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="Enter contact email"
+                        placeholder="أدخل البريد الإلكتروني للتواصل"
                         {...field}
                         className="h-11"
                       />
@@ -145,7 +145,7 @@ export default function PersonalInfoCard({ data, onChange }: PersonalInfoCardPro
                 name="dateOfBirth"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <label className="text-sm font-medium text-muted-foreground">Date of Birth</label>
+                    <label className="text-sm font-medium text-muted-foreground">تاريخ الميلاد</label>
                     <FormControl>
                       <Input
                         type="date"
@@ -163,16 +163,16 @@ export default function PersonalInfoCard({ data, onChange }: PersonalInfoCardPro
                 name="gender"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <label className="text-sm font-medium text-muted-foreground">Gender</label>
+                    <label className="text-sm font-medium text-muted-foreground">الجنس</label>
                     <Select onValueChange={field.onChange} value={field.value || ""}>
                       <FormControl>
                         <SelectTrigger className="h-11">
-                          <SelectValue placeholder="Select gender" />
+                          <SelectValue placeholder="اختر الجنس" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="MALE">Male</SelectItem>
-                        <SelectItem value="FEMALE">Female</SelectItem>
+                        <SelectItem value="MALE">ذكر</SelectItem>
+                        <SelectItem value="FEMALE">أنثى</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -185,18 +185,18 @@ export default function PersonalInfoCard({ data, onChange }: PersonalInfoCardPro
                 name="maritalStatus"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <label className="text-sm font-medium text-muted-foreground">Marital Status</label>
+                    <label className="text-sm font-medium text-muted-foreground">الحالة الاجتماعية</label>
                     <Select onValueChange={field.onChange} value={field.value || ""}>
                       <FormControl>
                         <SelectTrigger className="h-11">
-                          <SelectValue placeholder="Select status" />
+                          <SelectValue placeholder="اختر الحالة" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="SINGLE">Single</SelectItem>
-                        <SelectItem value="MARRIED">Married</SelectItem>
-                        <SelectItem value="DIVORCED">Divorced</SelectItem>
-                        <SelectItem value="WIDOWED">Widowed</SelectItem>
+                        <SelectItem value="SINGLE">أعزب</SelectItem>
+                        <SelectItem value="MARRIED">متزوج</SelectItem>
+                        <SelectItem value="DIVORCED">مطلق</SelectItem>
+                        <SelectItem value="WIDOWED">أرمل</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -210,10 +210,10 @@ export default function PersonalInfoCard({ data, onChange }: PersonalInfoCardPro
               name="nationality"
               render={({ field }) => (
                 <FormItem className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Nationality</label>
+                  <label className="text-sm font-medium text-muted-foreground">الجنسية</label>
                   <FormControl>
                     <Input
-                      placeholder="Enter nationality"
+                      placeholder="أدخل الجنسية"
                       {...field}
                       className="h-11"
                     />

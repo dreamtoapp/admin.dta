@@ -49,13 +49,13 @@ export default function ProfileCompletionBar({ data }: ProfileCompletionBarProps
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
           <Target className="h-4 w-4" />
-          Profile Completion
+          اكتمال الملف الشخصي
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">Completion</span>
+            <span className="text-xs text-muted-foreground">الاكتمال</span>
             <span className="text-sm font-medium">{completionPercentage}%</span>
           </div>
           <Progress value={completionPercentage} className="h-2" />

@@ -211,14 +211,14 @@ export default function StaffProfileClient() {
           return;
         }
         const response = await fetch(`/api/users/${session.user.id}`);
-        if (!response.ok) throw new Error("Failed to fetch user profile");
+        if (!response.ok) throw new Error("فشل في تحميل بيانات الملف الشخصي");
         const data = await response.json();
         console.log("API response data:", data);
         console.log("Normalized profile data:", normalizeProfile(data));
         setProfileData(normalizeProfile(data));
       } catch (error) {
         console.error("Failed to fetch profile data:", error);
-        setError("Failed to load profile data. Please refresh the page.");
+        setError("فشل في تحميل بيانات الملف الشخصي. يرجى تحديث الصفحة.");
         // Keep empty structure if API fails
         console.log("Using empty profile structure");
         setProfileData({
@@ -320,13 +320,13 @@ export default function StaffProfileClient() {
         body: JSON.stringify(payload)
       });
 
-      if (!res.ok) throw new Error("Failed to update profile");
+      if (!res.ok) throw new Error("فشل في تحديث الملف الشخصي");
       const json = await res.json();
       const updated = json.user ?? json;
       setProfileData(prev => normalizeProfile({ ...prev, ...updated }));
     } catch (error) {
       console.error("Failed to update profile:", error);
-      setError("Failed to save profile changes. Please try again.");
+      setError("فشل في حفظ تغييرات الملف الشخصي. يرجى المحاولة مرة أخرى.");
       // Optimistic fallback
       setProfileData(prev => ({ ...prev, ...updatedData }));
       throw error;
@@ -436,7 +436,7 @@ export default function StaffProfileClient() {
       if (!response.ok) {
         const errorText = await response.text();
         console.error("API Error response:", errorText);
-        throw new Error(`Failed to save profile: ${response.statusText} - ${errorText}`);
+        throw new Error(`فشل في حفظ الملف الشخصي: ${response.statusText} - ${errorText}`);
       }
 
       const result = await response.json();
@@ -456,30 +456,30 @@ export default function StaffProfileClient() {
       }
 
       // Show success message with SweetAlert2
-      setSuccess("Profile updated successfully!");
+      setSuccess("تم تحديث الملف الشخصي بنجاح!");
       setError(null);
 
       await Swal.fire({
         icon: 'success',
-        title: 'Profile Updated!',
-        text: 'Your profile has been successfully updated.',
+        title: 'تم التحديث!',
+        text: 'تم تحديث ملفك الشخصي بنجاح.',
         confirmButtonColor: '#0d3ad7',
-        confirmButtonText: 'Great!'
+        confirmButtonText: 'ممتاز!'
       });
 
     } catch (error) {
       console.error("Failed to save all profile data globally:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to save profile. Please try again.";
+      const errorMessage = error instanceof Error ? error.message : "فشل في حفظ الملف الشخصي. يرجى المحاولة مرة أخرى.";
       setError(errorMessage);
       setSuccess(null);
 
       // Show error message with SweetAlert2
       await Swal.fire({
         icon: 'error',
-        title: 'Update Failed',
+        title: 'فشل التحديث',
         text: errorMessage,
         confirmButtonColor: '#dc2626',
-        confirmButtonText: 'Try Again'
+        confirmButtonText: 'حاول مرة أخرى'
       });
     } finally {
       setSaving(false);
@@ -491,18 +491,18 @@ export default function StaffProfileClient() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading profile...</p>
+          <p className="text-muted-foreground">جاري تحميل الملف الشخصي...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" dir="rtl">
       {/* Error and Success Messages */}
       {error && (
         <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg">
-          <p className="font-medium">Error: {error}</p>
+          <p className="font-medium">خطأ: {error}</p>
         </div>
       )}
 
@@ -521,7 +521,7 @@ export default function StaffProfileClient() {
               <div className="h-24 w-24 ring-4 ring-primary/10 shadow-lg rounded-full overflow-hidden">
                 <AddImage
                   url={profileData.profileImage || undefined}
-                  alt={profileData.fullName || "Profile"}
+                  alt={profileData.fullName || "الملف الشخصي"}
                   recordId={profileData.id}
                   table="user"
                   tableField="profileImage"
@@ -533,27 +533,27 @@ export default function StaffProfileClient() {
                 />
               </div>
               <p className="mt-2 text-xs text-muted-foreground max-w-[16rem]">
-                Please choose a clear, professional photo. This image appears on the Team page.
+                يرجى اختيار صورة واضحة ومهنية. تظهر هذه الصورة في صفحة الفريق.
               </p>
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
-                <h1 className="text-3xl font-bold tracking-tight">{profileData.fullName || "Staff Member"}</h1>
-                <Badge variant="outline" className="text-sm px-3 py-1">{profileData.role}</Badge>
+                <h1 className="text-3xl font-bold tracking-tight">{profileData.fullName || "عضو الفريق"}</h1>
+                <Badge variant="outline" className="text-sm px-3 py-1">{profileData.role === 'STAFF' ? 'موظف' : profileData.role === 'ADMIN' ? 'مدير' : 'عميل'}</Badge>
               </div>
               <div className="flex items-center gap-6 text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Building2 className="h-4 w-4" />
-                  <span className="text-sm">{profileData.department || "No department"}</span>
+                  <span className="text-sm">{profileData.department || "لا يوجد قسم"}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  <span className="text-sm">Hired: {profileData.hireDate ? profileData.hireDate.toLocaleDateString() : "Not set"}</span>
+                  <span className="text-sm">تاريخ التعيين: {profileData.hireDate ? profileData.hireDate.toLocaleDateString() : "غير محدد"}</span>
                 </div>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-sm text-muted-foreground mb-1">Profile Completion</div>
+              <div className="text-sm text-muted-foreground mb-1">اكتمال الملف الشخصي</div>
               <div className="text-3xl font-bold text-primary mb-3">{calculateProfileCompletion(profileData)}%</div>
               {/* Global Save Button as per Task 3.1 */}
               <Button
@@ -565,12 +565,12 @@ export default function StaffProfileClient() {
                 {saving ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Saving...
+                    جاري الحفظ...
                   </>
                 ) : (
                   <>
                     <User className="h-4 w-4 mr-2" />
-                    Save All Changes
+                    حفظ جميع التغييرات
                   </>
                 )}
               </Button>
@@ -588,7 +588,7 @@ export default function StaffProfileClient() {
                 <div className="p-2 bg-destructive/20 rounded-lg">
                   <Building2 className="h-6 w-6 text-destructive" />
                 </div>
-                Employment Information
+                معلومات التوظيف
                 <div className="ml-auto">
                   <div className={`w-5 h-5 transition-transform duration-200 ${isEmploymentOpen ? 'rotate-180' : ''}`}>
                     <svg
@@ -613,44 +613,44 @@ export default function StaffProfileClient() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="space-y-3">
                   <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Job Title</label>
-                    <div className="text-sm font-semibold">{profileData.jobTitle || "Not specified"}</div>
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">المسمى الوظيفي</label>
+                    <div className="text-sm font-semibold">{profileData.jobTitle || "غير محدد"}</div>
                   </div>
                   <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Job Level</label>
-                    <div className="text-sm font-semibold">{profileData.jobLevel || "Not specified"}</div>
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">المستوى الوظيفي</label>
+                    <div className="text-sm font-semibold">{profileData.jobLevel || "غير محدد"}</div>
                   </div>
                   <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Contract Type</label>
-                    <div className="text-sm font-semibold">{profileData.contractType || "Not specified"}</div>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Basic Salary</label>
-                    <div className="text-sm font-semibold">{profileData.basicSalary || "Not specified"}</div>
-                  </div>
-                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Bonus</label>
-                    <div className="text-sm font-semibold">{profileData.bonus || "Not specified"}</div>
-                  </div>
-                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Work Schedule</label>
-                    <div className="text-sm font-semibold">{profileData.workSchedule || "Not specified"}</div>
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">نوع العقد</label>
+                    <div className="text-sm font-semibold">{profileData.contractType || "غير محدد"}</div>
                   </div>
                 </div>
                 <div className="space-y-3">
                   <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Work Location</label>
-                    <div className="text-sm font-semibold">{profileData.workLocation || "Not specified"}</div>
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">الراتب الأساسي</label>
+                    <div className="text-sm font-semibold">{profileData.basicSalary || "غير محدد"}</div>
                   </div>
                   <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Notice Period</label>
-                    <div className="text-sm font-semibold">{profileData.noticePeriod ? `${profileData.noticePeriod} days` : "Not specified"}</div>
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">المكافأة</label>
+                    <div className="text-sm font-semibold">{profileData.bonus || "غير محدد"}</div>
                   </div>
                   <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Employment Status</label>
-                    <div className="text-sm font-semibold">{profileData.employmentStatus || "Not specified"}</div>
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">جدول العمل</label>
+                    <div className="text-sm font-semibold">{profileData.workSchedule || "غير محدد"}</div>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">موقع العمل</label>
+                    <div className="text-sm font-semibold">{profileData.workLocation || "غير محدد"}</div>
+                  </div>
+                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">فترة الإشعار</label>
+                    <div className="text-sm font-semibold">{profileData.noticePeriod ? `${profileData.noticePeriod} يوم` : "غير محدد"}</div>
+                  </div>
+                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">حالة التوظيف</label>
+                    <div className="text-sm font-semibold">{profileData.employmentStatus || "غير محدد"}</div>
                   </div>
                 </div>
               </div>

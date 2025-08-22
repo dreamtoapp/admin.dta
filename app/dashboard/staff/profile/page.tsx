@@ -9,10 +9,10 @@ export default async function StaffProfilePage() {
   if (session.user?.role !== UserRole.STAFF && session.user?.role !== UserRole.CLIENT) redirect("/dashboard");
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6" dir="rtl">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">My Profile</h1>
-        <p className="text-muted-foreground mt-2">Update your personal information</p>
+        <h1 className="text-3xl font-bold text-foreground">ملفي الشخصي</h1>
+        <p className="text-muted-foreground mt-2">تحديث معلوماتك الشخصية</p>
       </div>
       <StaffProfileClient />
     </div>
