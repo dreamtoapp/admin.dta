@@ -1,20 +1,21 @@
 "use client";
 
-import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { useEffect } from "react";
+
 type ThemeProviderProps = {
   children: React.ReactNode;
-  // Add any other props you expect here
 };
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  return (
-    <NextThemesProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
-      {children}
-    </NextThemesProvider>
-  );
+  useEffect(() => {
+    // Force dark mode permanently
+    document.documentElement.classList.add('dark');
+    document.documentElement.classList.remove('light');
+
+    // Remove any theme-related attributes
+    document.documentElement.removeAttribute('data-theme');
+    document.documentElement.removeAttribute('data-mode');
+  }, []);
+
+  return <>{children}</>;
 }

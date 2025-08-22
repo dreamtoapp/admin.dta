@@ -10,6 +10,70 @@
   --brand-secondary: 200 100% 78%; /* #99e4ff */
   --brand-accent: 45 100% 45%; /* #d7a50d */
   --brand-accent-light: 45 100% 60%; /* #f4c430 - lighter accent */
+
+  /* Font Family */
+  --font-family: 'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+
+  /* DARK MODE ONLY - DreamToApp Branding with Brand Colors */
+  --background: 227 100% 8%; /* Dark blue background - your brand primary */
+  --foreground: 200 100% 95%; /* Light blue text - your brand secondary */
+
+  /* Cards and Popovers - Using Brand Colors */
+  --card: 227 100% 12%; /* Darker blue for cards - brand primary variant */
+  --card-foreground: 200 100% 95%; /* Light blue text - brand secondary */
+  --popover: 227 100% 12%; /* Darker blue for popovers - brand primary variant */
+  --popover-foreground: 200 100% 95%; /* Light blue text - brand secondary */
+
+  /* Primary Brand Colors - Your DreamToApp Palette */
+  --primary: 200 100% 85%; /* #99e4ff - Your brand secondary (light blue) */
+  --primary-foreground: 227 100% 42%; /* #0d3ad7 - Your brand primary (dark blue) */
+
+  /* Secondary Brand Colors - Your DreamToApp Palette */
+  --secondary: 227 100% 20%; /* Darker blue for secondary elements - brand primary variant */
+  --secondary-foreground: 200 100% 85%; /* Light blue text - brand secondary */
+
+  /* Muted Elements - Brand Color Based */
+  --muted: 227 100% 16%; /* Dark blue for muted elements - brand primary variant */
+  --muted-foreground: 200 100% 70%; /* Medium light blue for muted text - brand secondary variant */
+
+  /* Accent Brand Colors - Your Golden Yellow */
+  --accent: 45 100% 55%; /* #d7a50d - Your brand accent (golden yellow) */
+  --accent-foreground: 227 100% 42%; /* #0d3ad7 - Dark blue text on accent elements */
+
+  /* Destructive colors - Brand Consistent */
+  --destructive: 0 62.8% 40%; /* Dark red */
+  --destructive-foreground: 200 100% 95%; /* Light blue text - using brand secondary */
+
+  /* Borders and input fields - Brand Color Based */
+  --border: 200 100% 25%; /* Light blue borders - brand secondary variant */
+  --input: 200 100% 20%; /* Input field color - brand secondary variant */
+
+  /* Focus ring - Your Brand Primary */
+  --ring: 227 100% 42%; /* #0d3ad7 - Your brand primary for focus ring */
+
+  /* Semantic Status Colors for Cards - Dark Mode */
+  --info-soft-background: 220 50% 15%;    /* Dark Blue BG */
+  --info-foreground: 220 80% 85%;         /* Light Blue Text */
+  --success-soft-background: 150 50% 15%; /* Dark Green BG */
+  --success-foreground: 150 70% 75%;      /* Light Green Text */
+  --warning-soft-background: 45 50% 18%;  /* Dark Yellow BG */
+  --warning-foreground: 45 80% 75%;       /* Light Yellow Text */
+  --neutral-soft-background: 270 40% 15%; /* Dark Purple BG */
+  --neutral-foreground: 270 70% 80%;      /* Light Purple Text */
+  --danger-soft-background: 0 50% 18%;    /* Dark Red BG */
+  --danger-foreground: 0 80% 80%;         /* Light Red Text */
+  --special-soft-background: 330 40% 18%; /* Dark Pink BG */
+  --special-foreground: 330 70% 80%;      /* Light Pink Text */
+
+  /* Chart colors */
+  --chart-1: 220 70% 50%; /* Blue */
+  --chart-2: 160 60% 45%; /* Blue-green */
+  --chart-3: 30 80% 55%; /* Orange */
+  --chart-4: 280 65% 60%; /* Purple */
+  --chart-5: 340 75% 55%; /* Pink */
+
+  /* Border radius */
+  --radius: 0.5rem;
 }
 
 @layer base {
@@ -28,8 +92,6 @@
   
   .hover\:text-brand-primary:hover { color: #0d3ad7; }
   .hover\:text-brand-secondary:hover { color: #99e4ff; }
-  .hover\:text-brand-accent:hover { color: #d7a50d; }
-  
   .hover\:bg-brand-primary:hover { background-color: #0d3ad7; }
   .hover\:bg-brand-secondary:hover { background-color: #99e4ff; }
   .hover\:bg-brand-accent:hover { background-color: #d7a50d; }
@@ -56,147 +118,34 @@
       radial-gradient(circle at 75% 75%, rgba(13, 58, 215, 0.05) 0%, transparent 50%);
   }
 
-  :root {
-    /* Light Mode - DreamToApp Branding */
-    --background: 200 100% 98%; /* Enhanced light blue-tinted background */
-    --foreground: 222.2 84% 10%; /* Dark text for good contrast */
-
-    /* Cards and Popovers */
-    --card: 200 100% 99.5%; /* Very light blue-tinted background for cards */
-    --card-foreground: 222.2 84% 10%; /* Dark text for cards */
-    --popover: 200 100% 99.5%; /* Very light blue-tinted background for popovers */
-    --popover-foreground: 222.2 84% 10%; /* Dark text for popovers */
-
-    /* Primary Brand Colors */
-    --primary: 227 100% 42%; /* #0d3ad7 - Primary blue */
-    --primary-foreground: 0 0% 100%; /* White text on primary buttons */
-
-    /* Secondary Brand Colors */
-    --secondary: 200 100% 85%; /* #99e4ff - Light blue */
-    --secondary-foreground: 227 100% 42%; /* Dark blue text on secondary elements */
-
-    /* Muted Elements */
-    --muted: 200 100% 95%; /* Very light blue */
-    --muted-foreground: 227 100% 35%; /* Darker blue for muted text */
-
-    /* Accent Brand Colors */
-    --accent: 45 100% 45%; /* #d7a50d - Golden yellow */
-    
-    --success: 142 76% 36%; /* Green for success states */
-    --success-foreground: 355 7% 97%; /* White text on success */
-    --accent-foreground: 0 0% 100%; /* White text on accent elements */
-
-    /* Destructive Colors */
-    --destructive: 0 84.2% 60.2%; /* Red for destructive actions */
-    --destructive-foreground: 0 0% 100%; /* White text on destructive buttons */
-
-    /* Borders and Inputs */
-    --border: 200 100% 90%; /* Light blue borders */
-    --input: 200 100% 95%; /* Very light blue input fields */
-
-    /* Focus Ring */
-    --ring: 227 100% 42%; /* Primary blue for focus ring */
-
-    /* Border radius */
-    --radius: 0.5rem;
-
-    /* Semantic Status Colors for Cards - Light Mode */
-    --info-soft-background: 220 90% 93%;    /* Light Blue BG */
-    --info-foreground: 224 76% 48%;         /* Dark Blue Text */
-    --success-soft-background: 150 75% 90%; /* Light Green BG */
-    --success-foreground: 160 93% 24%;      /* Dark Green Text */
-    --warning-soft-background: 56 90% 88%;  /* Light Yellow BG */
-    --warning-foreground: 30 89% 37%;       /* Dark Yellow/Orange Text */
-    --neutral-soft-background: 270 100% 95%;/* Light Purple BG */
-    --neutral-foreground: 270 65% 40%;      /* Dark Purple Text */
-    --danger-soft-background: 0 90% 94%;    /* Light Red BG */
-    --danger-foreground: 0 72% 42%;         /* Dark Red Text */
-    --special-soft-background: 330 80% 95%; /* Light Pink BG */
-    --special-foreground: 330 77% 42%;      /* Dark Pink Text */
-
-    /* Chart colors */
-    --chart-1: 12 76% 61%; /* Chart colors */
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-  }
-
-  .dark {
-    /* Dark Mode - DreamToApp Branding */
-    --background: 227 100% 8%; /* Dark blue background */
-    --foreground: 200 100% 95%; /* Light blue text for good contrast */
-
-    /* Cards and Popovers */
-    --card: 227 100% 12%; /* Darker blue for cards */
-    --card-foreground: 200 100% 95%; /* Light blue text for cards */
-    --popover: 227 100% 12%; /* Darker blue for popovers */
-    --popover-foreground: 200 100% 95%; /* Light blue text for popovers */
-
-    /* Primary Brand Colors */
-    --primary: 200 100% 85%; /* #99e4ff - Light blue as primary in dark mode */
-    --primary-foreground: 227 100% 42%; /* Dark blue text on primary buttons */
-
-    /* Secondary Brand Colors */
-    --secondary: 227 100% 20%; /* Darker blue for secondary elements */
-    --secondary-foreground: 200 100% 85%; /* Light blue text on secondary elements */
-
-    /* Muted Elements */
-    --muted: 227 100% 16%; /* Dark blue for muted elements */
-    --muted-foreground: 200 100% 70%; /* Medium light blue for muted text */
-
-    /* Accent Brand Colors */
-    --accent: 45 100% 55%; /* #d7a50d - Brighter golden yellow for dark mode */
-    --accent-foreground: 227 100% 42%; /* Dark blue text on accent elements */
-
-    /* Destructive colors */
-    --destructive: 0 62.8% 40%; /* Dark red */
-    --destructive-foreground: 0 0% 100%; /* White text on destructive buttons */
-
-    /* Borders and input fields */
-    --border: 217.2 32.6% 25%; /* Border color (dark gray - adjusted to be lighter) */
-    --input: 217.2 32.6% 20%; /* Input field color (dark gray) */
-
-    /* Focus ring */
-    --ring: 210 80% 50%; /* Focus ring color (blue) */
-
-    /* Semantic Status Colors for Cards - Dark Mode */
-    --info-soft-background: 220 50% 15%;    /* Dark Blue BG */
-    --info-foreground: 220 80% 85%;         /* Light Blue Text */
-    --success-soft-background: 150 50% 15%; /* Dark Green BG */
-    --success-foreground: 150 70% 75%;      /* Light Green Text */
-    --warning-soft-background: 45 50% 18%;  /* Dark Yellow BG */
-    --warning-foreground: 45 80% 75%;       /* Light Yellow Text */
-    --neutral-soft-background: 270 40% 15%; /* Dark Purple BG */
-    --neutral-foreground: 270 70% 80%;      /* Light Purple Text */
-    --danger-soft-background: 0 50% 18%;    /* Dark Red BG */
-    --danger-foreground: 0 80% 80%;         /* Light Red Text */
-    --special-soft-background: 330 40% 18%; /* Dark Pink BG */
-    --special-foreground: 330 70% 80%;      /* Light Pink Text */
-
-    /* Chart colors */
-    --chart-1: 220 70% 50%; /* Blue */
-    --chart-2: 160 60% 45%; /* Blue-green */
-    --chart-3: 30 80% 55%; /* Orange */
-    --chart-4: 280 65% 60%; /* Purple */
-    --chart-5: 340 75% 55%; /* Pink */
-  }
-}
-
-@layer base {
   * {
     @apply border-border outline-ring/50;
     box-sizing: border-box; /* Prevent layout shifts */
   }
   body {
     @apply bg-background text-foreground;
-    /* Enhanced light mode background with subtle patterns */
+    font-family: var(--font-family);
+    direction: rtl;
+    text-align: right;
+    /* Enhanced dark mode background with DreamToApp brand colors */
     background-image: 
       radial-gradient(circle at 20% 80%, rgba(153, 228, 255, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(13, 58, 215, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, rgba(215, 165, 13, 0.05) 0%, transparent 50%);
+      radial-gradient(circle at 80% 20%, rgba(13, 58, 215, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(215, 165, 13, 0.08) 0%, transparent 50%);
     background-attachment: fixed;
     background-size: 100% 100%;
+  }
+  
+  /* RTL Text Alignment */
+  h1, h2, h3, h4, h5, h6, p, span, div {
+    text-align: right;
+  }
+  
+  /* Arabic Font Optimization */
+  .arabic-text {
+    font-family: var(--font-family);
+    line-height: 1.6;
+    letter-spacing: 0.01em;
   }
   
   /* 🚨 CRITICAL: Layout Shift Prevention */
@@ -227,67 +176,30 @@
   /* Optimize for layout stability */
   .layout-stable {
     contain: layout;
-    will-change: auto;
   }
   
-  /* Prevent cumulative layout shift */
-  .prevent-layout-shift {
-    contain: layout;
-    min-height: 1px;
+  /* Enhanced dark mode depth effects */
+  .dark-mode-depth {
+    box-shadow: 
+      0 1px 3px 0 rgba(0, 0, 0, 0.3),
+      0 1px 2px 0 rgba(0, 0, 0, 0.2);
   }
   
-  /* Image optimization for layout stability */
-  .image-container {
-    position: relative;
-    overflow: hidden;
-    contain: layout;
+  /* Dark mode glassmorphism */
+  .dark-glass {
+    background: rgba(13, 58, 215, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(153, 228, 255, 0.1);
   }
   
-  /* Loading placeholder to prevent layout shift */
-  .image-placeholder {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: loading 1.5s infinite;
+  /* Dark mode hover effects */
+  .dark-hover {
+    transition: all 0.2s ease-in-out;
   }
   
-  /* 🚨 DOM SIZE OPTIMIZATION */
-  /* Prevent excessive DOM elements */
-  .dom-optimized {
-    contain: layout style;
-  }
-  
-  /* Limit nested elements */
-  .limit-nesting > * > * > * > * > * > * > * > * > * > * {
-    display: none;
-  }
-  
-  /* Optimize grid layouts */
-  .grid-optimized {
-    contain: layout;
-  }
-  
-  /* Reduce unnecessary wrappers */
-  .no-unnecessary-wrappers {
-    contain: layout;
-  }
-  
-  /* Optimize card components */
-  .card-optimized {
-    contain: layout style;
-  }
-  
-  /* Clean up empty elements */
-  .cleanup-empty:empty {
-    display: none;
-  }
-  
-  @keyframes loading {
-    0% {
-      background-position: 200% 0;
-    }
-    100% {
-      background-position: -200% 0;
-    }
+  .dark-hover:hover {
+    background: rgba(153, 228, 255, 0.05);
+    border-color: rgba(153, 228, 255, 0.2);
   }
 }
 /* Add these custom animations to your globals.css */
@@ -480,21 +392,6 @@
 /* Smooth scrolling for the scroll indicator */
 html {
   scroll-behavior: smooth;
-}
-
-/* Enhanced Light Mode Visual Depth */
-.light-mode-depth {
-  box-shadow: 
-    0 1px 3px rgba(13, 58, 215, 0.1),
-    0 1px 2px rgba(153, 228, 255, 0.06);
-}
-
-.light-mode-depth-hover:hover {
-  box-shadow: 
-    0 4px 6px rgba(13, 58, 215, 0.15),
-    0 2px 4px rgba(153, 228, 255, 0.1);
-  transform: translateY(-1px);
-  transition: all 0.2s ease-in-out;
 }
 
 /* Brand-colored scrollbar for light mode */

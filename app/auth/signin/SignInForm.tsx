@@ -11,8 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 const schema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  email: z.string().email({ message: "يرجى إدخال عنوان بريد إلكتروني صحيح" }),
+  password: z.string().min(6, { message: "يجب أن تكون كلمة المرور 6 أحرف على الأقل" }),
 });
 
 type SignInValues = z.infer<typeof schema>;
@@ -39,7 +39,7 @@ export default function SignInForm() {
     });
 
     if (result?.error) {
-      setError("Invalid credentials. Please try again.");
+      setError("بيانات الاعتماد غير صحيحة. يرجى المحاولة مرة أخرى.");
       return;
     }
 
@@ -55,7 +55,7 @@ export default function SignInForm() {
     <Form {...form}>
       <form className="mt-8 space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
         {error && (
-          <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-md text-sm">
+          <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-md text-sm text-right">
             {error}
           </div>
         )}
@@ -66,16 +66,17 @@ export default function SignInForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email address</FormLabel>
+                <FormLabel className="text-right block">البريد الإلكتروني</FormLabel>
                 <FormControl>
                   <Input
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder="أدخل بريدك الإلكتروني"
                     autoComplete="email"
+                    className="text-right"
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-right" />
               </FormItem>
             )}
           />
@@ -85,26 +86,27 @@ export default function SignInForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel className="text-right block">كلمة المرور</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
+                      placeholder="أدخل كلمة المرور"
                       autoComplete="current-password"
+                      className="text-right pr-20"
                       {...field}
                     />
                     <Button
                       type="button"
                       variant="ghost"
-                      className="absolute right-1 top-1/2 -translate-y-1/2 h-7 px-2 text-xs"
+                      className="absolute left-1 top-1/2 -translate-y-1/2 h-7 px-2 text-xs"
                       onClick={() => setShowPassword((s) => !s)}
                     >
-                      {showPassword ? "Hide" : "Show"}
+                      {showPassword ? "إخفاء" : "إظهار"}
                     </Button>
                   </div>
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-right" />
               </FormItem>
             )}
           />
@@ -115,7 +117,7 @@ export default function SignInForm() {
           className="w-full"
           disabled={form.formState.isSubmitting}
         >
-          {form.formState.isSubmitting ? "Signing in..." : "Sign in"}
+          {form.formState.isSubmitting ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
         </Button>
       </form>
     </Form>

@@ -198,7 +198,7 @@ export default function Sidebar({ user }: SidebarProps) {
               variant="ghost"
               size="sm"
               className="w-full justify-start text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-              onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+              onClick={() => signOut({ callbackUrl: "/" })}
             >
               <LogOut className="h-4 w-4 mr-2" />
               Sign Out

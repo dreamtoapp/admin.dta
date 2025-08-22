@@ -1,132 +1,41 @@
-import './globals.css';
+import type { Metadata } from "next";
+import { Tajawal } from "next/font/google";
+import "./globals.css";
+import { ThemeProvider } from "@/provider/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 
-export const metadata = {
-  manifest: '/manifest.json',
-  metadataBase: new URL('https://www.dreamto.app'),
-  title: {
-    default: 'DreamToApp IT Solutions – Digital Innovation Agency',
-    template: '%s | DreamToApp IT Solutions',
-  },
-  description: 'DreamToApp is a leading IT agency offering web, mobile, and cloud solutions. Explore our portfolio, services, and contact us for digital excellence.',
-  openGraph: {
-    title: 'DreamToApp IT Solutions',
-    description: 'Digital innovation, web, mobile, and cloud solutions for your business.',
-    url: 'https://www.dreamto.app',
-    siteName: 'DreamToApp IT Solutions',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'DreamToApp IT Solutions',
-      },
-    ],
-    locale: 'en',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    site: '@dreamtoapp',
-    title: 'DreamToApp IT Solutions',
-    description: 'Digital innovation, web, mobile, and cloud solutions for your business.',
-    images: ['/og-image.png'],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
-  icons: {
-    icon: '/favicon.ico',
-    apple: '/apple-icon.png',
-  },
-  alternates: {
-    canonical: 'https://www.dreamto.app',
-  },
-  verification: {
-    google: 'your-google-site-verification',
-  },
+const tajawal = Tajawal({
+  subsets: ["arabic", "latin"],
+  weight: ["200", "300", "400", "500", "700", "800", "900"],
+  variable: "--font-tajawal",
+});
+
+export const metadata: Metadata = {
+  title: "DreamToApp - حلول المؤسسات",
+  description: "منصة إدارة المؤسسات المهنية",
 };
 
-import NextTopLoader from 'nextjs-toploader';
-import { Suspense } from 'react';
-import Script from 'next/script';
-
-import { Toaster } from '@/components/ui/sonner';
-import { systemFonts } from './font';
-import { ThemeProvider } from '@/provider/theme-provider';
-import BackToTopWrapper from '@/components/ui/BackToTopWrapper';
-import { GTMProvider } from '@/components/GTMProvider';
-
-// Loading component for suspense boundaries
-const LoadingFallback = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
-  </div>
-);
-
-export default async function RootLayout({
+export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html
-      lang="en"
-      dir="ltr"
+      lang="ar"
+      dir="rtl"
+      className={`dark ${tajawal.variable}`}
       suppressHydrationWarning
     >
-      <head suppressHydrationWarning>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-        {/* Performance Optimizations */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* GTM Resource Hints */}
-        <link rel="preconnect" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://www.google-analytics.com" />
-        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-        <link rel="dns-prefetch" href="https://www.google-analytics.com" />
-        {/* SweetAlert2 CSS */}
+      <head>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
       </head>
-      <body className={`${systemFonts.className} min-h-screen bg-background antialiased`}>
-        {/* GTM Script - Next.js Official Method */}
-        <Script
-          id="gtm-script"
-          strategy="afterInteractive"
-          src={`https://www.googletagmanager.com/gtm.js?id=${process.env.NEXT_PUBLIC_GTM_ID || 'GTM-P43DC5FM'}`}
-        />
-
-        {/* GTM NoScript - For users with JavaScript disabled */}
-        <noscript>
-          <iframe
-            src={`https://www.googletagmanager.com/ns.html?id=${process.env.NEXT_PUBLIC_GTM_ID || 'GTM-P43DC5FM'}`}
-            height="0"
-            width="0"
-            style={{ display: 'none', visibility: 'hidden' }}
-          />
-        </noscript>
-
-        <NextTopLoader />
-
+      <body className={`${tajawal.className} antialiased`}>
         <ThemeProvider>
-          <GTMProvider locale="en">
-            {children}
-          </GTMProvider>
+          {children}
+          <Toaster />
         </ThemeProvider>
-
-        <Toaster position="top-right" />
-        <BackToTopWrapper />
       </body>
     </html>
   );
 }
-
-// To analyze your bundle, run: BUNDLE_ANALYZE=true pnpm build
-// import withBundleAnalyzer from '@next/bundle-analyzer';
